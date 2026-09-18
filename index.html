@@ -1,161 +1,1794 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <title>HEO Zone Prediction Trainer</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#040914;color:#eef7ff;font-family:Arial,sans-serif}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(#0784ff09 1px,transparent 1px),linear-gradient(90deg,#0784ff09 1px,transparent 1px);background-size:36px 36px}
-.wrap{width:min(1450px,97%);margin:auto;padding:12px;position:relative}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #174568;padding:8px 0 12px}
-.brand{display:flex;align-items:center;gap:10px}.brand img{width:58px;height:58px;object-fit:contain;border-radius:10px;background:#000;border:1px solid #087ec0}
-.brand h1{font-size:20px;margin:0}.brand small{color:#44bfff;font-weight:bold}
-.actions{display:flex;gap:7px;flex-wrap:wrap}
-button,select{border:1px solid #176491;background:#0a1b2d;color:#fff;border-radius:8px;padding:9px 11px;font-weight:bold}
-button{cursor:pointer}button:hover{background:#0e2c46}
-.layout{display:grid;grid-template-columns:230px minmax(0,1fr) 230px;gap:11px;margin-top:12px}
-.panel{background:#071423ee;border:1px solid #123d5d;border-radius:11px;padding:12px}.panel h2{font-size:14px;color:#54c7ff;margin:0 0 8px;text-transform:uppercase}
-.row{display:flex;align-items:center;gap:8px;padding:9px 3px;border-bottom:1px solid #163148}.dot{width:14px;height:14px;border-radius:50%}
-.b{background:#168cff}.g{background:#20d86a}.y{background:#ffd21a}.r{background:#ff405d}.p{background:#a855f7}
-.row button{margin-left:auto;padding:5px 8px;font-size:12px}
-.help{font-size:12px;line-height:1.5;color:#a9bfd0;margin-top:10px}
-.mapbox{position:relative;overflow:hidden;border-radius:13px;border:1px solid #1585c4;background:#000;touch-action:none}
-.mapbox img{display:block;width:100%;height:auto;pointer-events:none;user-select:none}
-.maptitle{position:absolute;top:9px;left:9px;z-index:20;background:#000b;padding:6px 9px;border:1px solid #187eb5;border-radius:7px;font-size:12px;font-weight:bold}
-.zone{position:absolute;transform:translate(-50%,-50%);aspect-ratio:1;border:3px solid var(--c);border-radius:50%;background:color-mix(in srgb,var(--c) 12%,transparent);display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;user-select:none;z-index:10}
-#z1{width:70%}#z2{width:50%}#z3{width:35%}#z4{width:23%}#z5{width:14%}
-.zone:active{cursor:grabbing}.zone span{background:#000a;padding:4px 7px;border-radius:5px;font-weight:900;text-shadow:0 2px 4px #000}
-.z1{--c:#168cff}.z2{--c:#20d86a}.z3{--c:#ffd21a}.z4{--c:#ff405d}.z5{--c:#a855f7}
-.maplist button{width:100%;text-align:left;margin:3px 0}.maplist button.active{border-color:#25bfff;box-shadow:0 0 10px #087ec055}
-.status{margin-top:8px;padding:8px 10px;background:#071522;border-radius:7px;color:#70cfff;font-size:12px}
-.seq{display:flex;gap:5px;align-items:center;margin-top:10px;overflow:auto;padding-bottom:2px}
-.seq .ball{width:13px;height:13px;border-radius:50%;flex:0 0 auto}.arrow{color:#8ba8bd;font-size:12px}
-.note{font-size:11px;color:#7893a5;margin-top:8px;line-height:1.45}
-.foot{text-align:center;color:#506b80;font-size:11px;padding:12px}
-@media(max-width:980px){.layout{grid-template-columns:1fr}.left,.right{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
-@media(max-width:600px){.wrap{width:99%;padding:7px}.brand h1{font-size:15px}.brand img{width:46px;height:46px}.actions button{padding:8px}.left,.right{display:block}.panel{margin-bottom:9px}.zone{border-width:2px}.zone span{font-size:11px}}
-</style>
-</head>
-<body>
-<div class="wrap">
-<header>
-  <div class="brand"><img src="assets/heo-logo.jpg" alt="HEO logo"><div><h1>HEO ZONE PREDICTION TRAINER</h1><small>PLAY • PREDICT • IMPROVE</small></div></div>
-  <div class="actions">
-    <select id="mapSelect" aria-label="Select map"></select>
-    <button id="demo">▶ Show Demo</button>
-    <button id="reset">↺ Reset</button>
-    <button id="hide">◉ Hide All</button>
-    <button id="show">◎ Show All</button>
-  </div>
-</header>
+*{
+  box-sizing:border-box;
+}
 
-<div class="layout">
-<aside class="left">
-  <div class="panel">
-    <h2>Zones • Fixed Game-like Size</h2>
-    <div class="row"><i class="dot b"></i>1st Zone<button data-id="z1">👁</button></div>
-    <div class="row"><i class="dot g"></i>2nd Zone<button data-id="z2">👁</button></div>
-    <div class="row"><i class="dot y"></i>3rd Zone<button data-id="z3">👁</button></div>
-    <div class="row"><i class="dot r"></i>4th Zone<button data-id="z4">👁</button></div>
-    <div class="row"><i class="dot p"></i>5th Zone<button data-id="z5">👁</button></div>
-    <div class="help"><b>Training</b><br>• Circle size is locked<br>• Drag only to move<br>• 1st → 2nd → 3rd → 4th → 5th gets smaller<br>• Use <b>Show Demo</b> for the preset sequence<br>• Reset returns to that map's preset</div>
-    <div class="seq"><span class="ball b"></span><span class="arrow">→</span><span class="ball g"></span><span class="arrow">→</span><span class="ball y"></span><span class="arrow">→</span><span class="ball r"></span><span class="arrow">→</span><span class="ball p"></span></div>
-  </div>
-</aside>
+body{
+  margin:0;
+  background:#090d14;
+  color:white;
+  font-family:Arial,Helvetica,sans-serif;
+  overflow:hidden;
+}
 
-<main>
-  <div class="mapbox" id="stage">
-    <div class="maptitle" id="mapTitle">BERMUDA • TRAINING MAP</div>
-    <img id="mapImage" src="maps/bermuda.jpg" alt="Free Fire map">
-    <div class="zone z1" id="z1"><span>1st</span></div>
-    <div class="zone z2" id="z2"><span>2nd</span></div>
-    <div class="zone z3" id="z3"><span>3rd</span></div>
-    <div class="zone z4" id="z4"><span>4th</span></div>
-    <div class="zone z5" id="z5"><span>5th</span></div>
-  </div>
-  <div class="status" id="status">Select a map, then press “Show Demo”. Drag any circle to make your own prediction.</div>
-</main>
+button,select{
+  background:#182232;
+  color:white;
+  border:1px solid #334158;
+  border-radius:7px;
+  padding:8px 10px;
+  cursor:pointer;
+}
 
-<aside class="right">
-  <div class="panel">
-    <h2>Maps</h2>
-    <div class="maplist" id="mapList"></div>
-    <div class="note">The four new maps use the map images you provided. Bermuda and the HEO logo are kept from your earlier website.</div>
-  </div>
-</aside>
-</div>
-<div class="foot">HIDDEN E-SPORTS ORGANISATION • ZONE PREDICTION TRAINING</div>
-</div>
+button:hover,
+button.active{
+  background:#31527c;
+}
 
-<script>
-const maps={
-  Bermuda:{file:"maps/bermuda.jpg", note:"Common-style training sequence", demo:{z1:[50,50],z2:[64,41],z3:[43,62],z4:[67,66],z5:[36,34]}},
-  Purgatory:{file:"maps/purgatory.jpg", note:"Common-style training sequence", demo:{z1:[50,47],z2:[61,38],z3:[44,55],z4:[67,62],z5:[36,70]}},
-  Kalahari:{file:"maps/kalahari.jpg", note:"Common-style training sequence", demo:{z1:[48,49],z2:[35,42],z3:[55,58],z4:[68,40],z5:[47,72]}},
-  NeXTerra:{file:"maps/nexterra.jpg", note:"Common-style training sequence", demo:{z1:[51,49],z2:[62,38],z3:[43,55],z4:[67,67],z5:[35,72]}},
-  Solara:{file:"maps/solara.jpg", note:"Common-style training sequence", demo:{z1:[50,50],z2:[38,42],z3:[55,58],z4:[67,36],z5:[43,73]}}
-};
+.header{
+  height:64px;
+  background:#101722;
+  border-bottom:1px solid #263244;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px 14px;
+}
 
-let current="Bermuda", active=null, sx=0, sy=0, px=0, py=0;
-const P={z1:[0,0],z2:[0,0],z3:[0,0],z4:[0,0],z5:[0,0]};
-const stage=document.getElementById("stage"), img=document.getElementById("mapImage");
-const status=document.getElementById("status");
+.logo{
+  width:44px;
+  height:44px;
+  object-fit:cover;
+  border-radius:8px;
+}
 
-function render(){
-  for(const id in P){
-    const e=document.getElementById(id);
-    e.style.left=P[id][0]+"%"; e.style.top=P[id][1]+"%";
+.title{
+  font-size:18px;
+  font-weight:800;
+  flex:1;
+}
+
+.controls{
+  display:flex;
+  gap:7px;
+}
+
+.main{
+  height:calc(100vh - 64px);
+  display:grid;
+  grid-template-columns:170px 1fr 150px;
+  gap:10px;
+  padding:10px;
+}
+
+.panel{
+  background:#101722;
+  border:1px solid #263244;
+  border-radius:10px;
+  padding:10px;
+  overflow:auto;
+}
+
+.panel h3{
+  font-size:13px;
+  margin:3px 0 10px;
+  color:#9fb2cc;
+}
+
+.zoneBtn,
+.right button{
+  width:100%;
+  margin-bottom:7px;
+  text-align:left;
+}
+
+.dot{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  margin-right:7px;
+}
+
+.z1d{background:#3da5ff}
+.z2d{background:#36d978}
+.z3d{background:#ffd43d}
+.z4d{background:#ff5d5d}
+.z5d{background:#b46cff}
+
+.map-area{
+  position:relative;
+  background:#05080d;
+  border:1px solid #263244;
+  border-radius:10px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  min-height:0;
+}
+
+.stage{
+  position:relative;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  touch-action:none;
+}
+
+.mapcontent{
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  transform-origin:0 0;
+  user-select:none;
+}
+
+.mapcontent img{
+  display:block;
+  width:100%;
+  height:auto;
+  pointer-events:none;
+  user-select:none;
+}
+
+/* FIXED GAME-LIKE TRAINING ZONE SIZES */
+
+.zone{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  border:3px solid;
+  pointer-events:auto;
+  touch-action:none;
+}
+
+.z1{
+  width:64%;
+  aspect-ratio:1;
+  border-color:#3da5ff88;
+  background:#3da5ff14;
+}
+
+.z2{
+  width:47%;
+  aspect-ratio:1;
+  border-color:#36d97888;
+  background:#36d97812;
+}
+
+.z3{
+  width:33%;
+  aspect-ratio:1;
+  border-color:#ffd43d99;
+  background:#ffd43d10;
+}
+
+.z4{
+  width:20%;
+  aspect-ratio:1;
+  border-color:#ff5d5d99;
+  background:#ff5d5d10;
+}
+
+.z5{
+  width:12%;
+  aspect-ratio:1;
+  border-color:#b46cffaa;
+  background:#b46cff12;
+}
+
+.zoneLabel{
+  position:absolute;
+  top:4px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:11px;
+  font-weight:800;
+  text-shadow:0 1px 3px #000;
+  white-space:nowrap;
+}
+
+/* DRAWING */
+
+#drawLayer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+.draw-mode #drawLayer{
+  pointer-events:auto;
+  cursor:crosshair;
+}
+
+.arrow{
+  stroke:#fff;
+  stroke-width:5;
+  fill:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  filter:drop-shadow(0 1px 2px #000);
+}
+
+.arrowHead{
+  fill:#fff;
+  filter:drop-shadow(0 1px 2px #000);
+}
+
+.status{
+  position:absolute;
+  left:10px;
+  bottom:10px;
+  background:#080c14dd;
+  border:1px solid #303c50;
+  border-radius:7px;
+  padding:6px 9px;
+  font-size:11px;
+  z-index:10;
+}
+
+.help{
+  font-size:11px;
+  color:#9aabc1;
+  line-height:1.45;
+  margin-top:10px;
+}
+
+/* MOBILE */
+
+@media(max-width:850px){
+
+  .main{
+    grid-template-columns:125px 1fr 110px;
+    gap:6px;
+    padding:6px;
+  }
+
+  .header{
+    height:58px;
+    padding:6px 8px;
+  }
+
+  .main{
+    height:calc(100vh - 58px);
+  }
+
+  .title{
+    font-size:13px;
+  }
+
+  .logo{
+    width:38px;
+    height:38px;
+  }
+
+  button,
+  select{
+    padding:7px 6px;
+    font-size:11px;
   }
 }
-function loadMap(name, demo=false){
-  current=name; img.src=maps[name].file;
-  document.getElementById("mapTitle").textContent=name.toUpperCase()+" • TRAINING MAP";
-  Object.assign(P, JSON.parse(JSON.stringify(maps[name].demo)));
-  document.querySelectorAll(".zone").forEach(e=>e.style.display="flex");
-  render();
-  status.textContent=demo ? "Demo sequence loaded for "+name+"." : name+" selected — press Show Demo or drag the zones.";
-  document.querySelectorAll("#mapList button").forEach(b=>b.classList.toggle("active",b.dataset.map===name));
-  document.getElementById("mapSelect").value=name;
-}
-function down(e){
-  active=e.currentTarget.id; sx=e.clientX; sy=e.clientY;
-  px=P[active][0]; py=P[active][1];
-  e.currentTarget.setPointerCapture?.(e.pointerId);
-  status.textContent="Moving "+active.replace("z","")+"th Zone…";
-}
-function move(e){
-  if(!active)return;
-  const r=stage.getBoundingClientRect();
-  P[active][0]=Math.max(8,Math.min(92,px+(e.clientX-sx)/r.width*100));
-  P[active][1]=Math.max(8,Math.min(92,py+(e.clientY-sy)/r.height*100));
-  render();
-}
-function up(){if(active)status.textContent="Zone placed. Drag again to reposition.";active=null}
 
-Object.assign(P,maps.Bermuda.demo);
-document.querySelectorAll(".zone").forEach(e=>{
-  e.addEventListener("pointerdown",down);e.addEventListener("pointermove",move);
-  e.addEventListener("pointerup",up);e.addEventListener("pointercancel",up);
-});
-document.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>{
-  const e=document.getElementById(b.dataset.id);
-  e.style.display=e.style.display==="none"?"flex":"none";
-});
-document.getElementById("hide").onclick=()=>document.querySelectorAll(".zone").forEach(e=>e.style.display="none");
-document.getElementById("show").onclick=()=>document.querySelectorAll(".zone").forEach(e=>e.style.display="flex");
-document.getElementById("demo").onclick=()=>loadMap(current,true);
-document.getElementById("reset").onclick=()=>loadMap(current,true);
-document.getElementById("mapSelect").onchange=e=>loadMap(e.target.value,false);
+@media(max-width:600px){
 
-const select=document.getElementById("mapSelect"), list=document.getElementById("mapList");
-Object.keys(maps).forEach(name=>{
-  const o=document.createElement("option");o.value=name;o.textContent=name;select.appendChild(o);
-  const b=document.createElement("button");b.dataset.map=name;b.textContent=(name==="Bermuda"?"🗺️ ":"")+" "+name;
-  b.onclick=()=>loadMap(name,false);list.appendChild(b);
-});
-loadMap("Bermuda",false);
+  .main{
+    grid-template-columns:82px 1fr 82px;
+  }
+
+  .title{
+    font-size:11px;
+  }
+
+  .panel h3{
+    font-size:10px;
+  }
+
+  .zoneBtn,
+  .right button{
+    font-size:10px;
+    padding:6px 4px;
+  }
+
+}
+</style>
+</head>
+
+
+<body>
+
+<header class="header">
+
+  <img
+    class="logo"
+    src="assets/heo-logo.jpg"
+    alt="HEO"
+  >
+
+  <div class="title">
+    HEO ZONE PREDICTION TRAINER
+  </div>
+
+  <div class="controls">
+
+    <button onclick="showDemo()">
+      🎯 Show Demo
+    </button>
+
+    <button onclick="resetAll()">
+      ↺ Reset
+    </button>
+
+    <button onclick="hideAll()">
+      Hide All
+    </button>
+
+    <button onclick="showAll()">
+      Show All
+    </button>
+
+  </div>
+
+</header>
+
+
+<main class="main">
+
+
+<!-- LEFT PANEL -->
+
+<aside class="panel">
+
+  <h3>ZONE CONTROL</h3>
+
+  <button
+    class="zoneBtn"
+    onclick="toggleZone(1)"
+  >
+    <span class="dot z1d"></span>
+    1st Zone
+  </button>
+
+  <button
+    class="zoneBtn"
+    onclick="toggleZone(2)"
+  >
+    <span class="dot z2d"></span>
+    2nd Zone
+  </button>
+
+  <button
+    class="zoneBtn"
+    onclick="toggleZone(3)"
+  >
+    <span class="dot z3d"></span>
+    3rd Zone
+  </button>
+
+  <button
+    class="zoneBtn"
+    onclick="toggleZone(4)"
+  >
+    <span class="dot z4d"></span>
+    4th Zone
+  </button>
+
+  <button
+    class="zoneBtn"
+    onclick="toggleZone(5)"
+  >
+    <span class="dot z5d"></span>
+    5th Zone
+  </button>
+
+  <div class="help">
+    Drag any zone to practice predicting the next safe zone.
+  </div>
+
+</aside>
+
+
+<!-- MAP -->
+
+<section class="map-area">
+
+  <div
+    id="stage"
+    class="stage"
+  >
+
+    <div
+      id="mapcontent"
+      class="mapcontent"
+    >
+
+      <img
+        id="mapImg"
+        src="maps/bermuda.jpg"
+        alt="Free Fire Map"
+      >
+
+
+      <div
+        id="z1"
+        class="zone z1"
+      >
+        <span class="zoneLabel">
+          1ST
+        </span>
+      </div>
+
+
+      <div
+        id="z2"
+        class="zone z2"
+      >
+        <span class="zoneLabel">
+          2ND
+        </span>
+      </div>
+
+
+      <div
+        id="z3"
+        class="zone z3"
+      >
+        <span class="zoneLabel">
+          3RD
+        </span>
+      </div>
+
+
+      <div
+        id="z4"
+        class="zone z4"
+      >
+        <span class="zoneLabel">
+          4TH
+        </span>
+      </div>
+
+
+      <div
+        id="z5"
+        class="zone z5"
+      >
+        <span class="zoneLabel">
+          5TH
+        </span>
+      </div>
+
+
+      <!-- ROTATION DRAWING LAYER -->
+
+      <svg
+        id="drawLayer"
+        viewBox="0 0 1000 1000"
+        preserveAspectRatio="none"
+      ></svg>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="status"
+    id="status"
+  >
+    Bermuda • Directional demo loaded
+  </div>
+
+</section>
+
+
+<!-- RIGHT PANEL -->
+
+<aside class="panel right">
+
+  <h3>MAPS</h3>
+
+  <select
+    id="mapSelect"
+    onchange="changeMap(this.value)"
+    style="width:100%;margin-bottom:10px"
+  >
+
+    <option value="bermuda">
+      Bermuda
+    </option>
+
+    <option value="purgatory">
+      Purgatory
+    </option>
+
+    <option value="kalahari">
+      Kalahari
+    </option>
+
+    <option value="nexterra">
+      NeXTerra
+    </option>
+
+    <option value="solara">
+      Solara
+    </option>
+
+  </select>
+
+
+  <h3>VIEW</h3>
+
+  <button onclick="zoomBy(1.25)">
+    ＋ Zoom
+  </button>
+
+  <button onclick="zoomBy(.8)">
+    － Zoom
+  </button>
+
+  <button onclick="resetView()">
+    ⛶ Fit Map
+  </button>
+
+
+  <h3>ROTATION</h3>
+
+  <button
+    id="drawBtn"
+    onclick="toggleDraw()"
+  >
+    ➡️ Draw Arrow
+  </button>
+
+  <button onclick="clearDrawings()">
+    🧹 Clear Draw
+  </button>
+
+
+  <div class="help">
+
+    Zoom the map and drag it around.
+
+    <br><br>
+
+    Activate Draw Arrow and drag from your
+    drop/rotation point to your destination.
+
+  </div>
+
+</aside>
+
+</main>
+
+
+<script>
+
+/* =========================================
+   MAPS + REALISTIC TRAINING PATHS
+   ========================================= */
+
+const maps = {
+
+  bermuda: {
+
+    file:
+      "maps/bermuda.jpg",
+
+    demo: {
+
+      z1:[50,50],
+
+      /* NE */
+
+      z2:[57,45],
+
+      /* SW */
+
+      z3:[51,51],
+
+      /* SE */
+
+      z4:[58,57],
+
+      /* NW/SW */
+
+      z5:[54,53]
+
+    }
+
+  },
+
+
+  purgatory: {
+
+    file:
+      "maps/purgatory.jpg",
+
+    demo: {
+
+      z1:[50,47],
+
+      /* SW */
+
+      z2:[44,52],
+
+      /* NE */
+
+      z3:[50,46],
+
+      /* NW */
+
+      z4:[43,41],
+
+      /* SE */
+
+      z5:[46,44]
+
+    }
+
+  },
+
+
+  kalahari: {
+
+    file:
+      "maps/kalahari.jpg",
+
+    demo: {
+
+      z1:[48,49],
+
+      /* NW */
+
+      z2:[42,44],
+
+      /* SE */
+
+      z3:[49,50],
+
+      /* NE */
+
+      z4:[56,46],
+
+      /* SW */
+
+      z5:[52,51]
+
+    }
+
+  },
+
+
+  nexterra: {
+
+    file:
+      "maps/nexterra.jpg",
+
+    demo: {
+
+      z1:[51,49],
+
+      /* NE */
+
+      z2:[58,44],
+
+      /* SW */
+
+      z3:[52,51],
+
+      /* SW */
+
+      z4:[46,57],
+
+      /* NE */
+
+      z5:[50,53]
+
+    }
+
+  },
+
+
+  solara: {
+
+    file:
+      "maps/solara.jpg",
+
+    demo: {
+
+      z1:[50,50],
+
+      /* NW */
+
+      z2:[44,44],
+
+      /* SE */
+
+      z3:[51,50],
+
+      /* NE */
+
+      z4:[58,45],
+
+      /* SW */
+
+      z5:[54,50]
+
+    }
+
+  }
+
+};
+
+
+/* =========================================
+   GLOBAL VARIABLES
+   ========================================= */
+
+let currentMap = "bermuda";
+
+let zoom = 1;
+
+let panX = 0;
+
+let panY = 0;
+
+let drawing = false;
+
+let drawStart = null;
+
+let preview = null;
+
+let mapPan = false;
+
+let lastX = 0;
+
+let lastY = 0;
+
+
+/* =========================================
+   ELEMENTS
+   ========================================= */
+
+const stage =
+  document.getElementById("stage");
+
+const content =
+  document.getElementById("mapcontent");
+
+const img =
+  document.getElementById("mapImg");
+
+const drawLayer =
+  document.getElementById("drawLayer");
+
+const statusEl =
+  document.getElementById("status");
+
+
+/* =========================================
+   ZONE POSITION
+   ========================================= */
+
+function setZone(id,x,y){
+
+  const zone =
+    document.getElementById("z"+id);
+
+  zone.style.left = x+"%";
+
+  zone.style.top = y+"%";
+
+}
+
+
+/* =========================================
+   LOAD MAP
+   ========================================= */
+
+function loadMap(name){
+
+  currentMap = name;
+
+  document.getElementById(
+    "mapSelect"
+  ).value = name;
+
+  img.src =
+    maps[name].file;
+
+
+  const demo =
+    maps[name].demo;
+
+
+  for(let i=1;i<=5;i++){
+
+    setZone(
+      i,
+      demo["z"+i][0],
+      demo["z"+i][1]
+    );
+
+  }
+
+
+  showAll();
+
+  clearDrawings();
+
+  resetView();
+
+
+  statusEl.textContent =
+    name.charAt(0).toUpperCase()+
+    name.slice(1)+
+    " • Directional demo loaded";
+
+}
+
+
+/* =========================================
+   MAP BUTTONS
+   ========================================= */
+
+function changeMap(name){
+
+  loadMap(name);
+
+}
+
+
+function showDemo(){
+
+  loadMap(currentMap);
+
+}
+
+
+function resetAll(){
+
+  loadMap(currentMap);
+
+}
+
+
+/* =========================================
+   ZONE VISIBILITY
+   ========================================= */
+
+function toggleZone(i){
+
+  const zone =
+    document.getElementById("z"+i);
+
+  zone.style.display =
+    zone.style.display === "none"
+      ? "block"
+      : "none";
+
+}
+
+
+function hideAll(){
+
+  for(let i=1;i<=5;i++){
+
+    document.getElementById(
+      "z"+i
+    ).style.display="none";
+
+  }
+
+}
+
+
+function showAll(){
+
+  for(let i=1;i<=5;i++){
+
+    document.getElementById(
+      "z"+i
+    ).style.display="block";
+
+  }
+
+}
+
+
+/* =========================================
+   ZOOM / PAN
+   ========================================= */
+
+function applyTransform(){
+
+  content.style.transform =
+    `translate(${panX}px,${panY}px) scale(${zoom})`;
+
+}
+
+
+function clampPan(){
+
+  const sw =
+    stage.clientWidth;
+
+  const sh =
+    stage.clientHeight;
+
+  const cw =
+    content.offsetWidth * zoom;
+
+  const ch =
+    content.offsetHeight * zoom;
+
+
+  if(cw <= sw){
+
+    panX=0;
+
+  }else{
+
+    panX =
+      Math.min(
+        0,
+        Math.max(
+          sw-cw,
+          panX
+        )
+      );
+
+  }
+
+
+  if(ch <= sh){
+
+    panY=0;
+
+  }else{
+
+    panY =
+      Math.min(
+        0,
+        Math.max(
+          sh-ch,
+          panY
+        )
+      );
+
+  }
+
+}
+
+
+function resetView(){
+
+  zoom=1;
+
+  panX=0;
+
+  panY=0;
+
+  applyTransform();
+
+}
+
+
+function zoomBy(factor){
+
+  const oldZoom =
+    zoom;
+
+  zoom =
+    Math.max(
+      1,
+      Math.min(
+        4,
+        zoom*factor
+      )
+    );
+
+
+  if(zoom===1){
+
+    panX=0;
+
+    panY=0;
+
+  }else{
+
+    const ratio =
+      zoom/oldZoom;
+
+    const cx =
+      stage.clientWidth/2;
+
+    const cy =
+      stage.clientHeight/2;
+
+
+    panX =
+      cx-(cx-panX)*ratio;
+
+    panY =
+      cy-(cy-panY)*ratio;
+
+
+    clampPan();
+
+  }
+
+
+  applyTransform();
+
+}
+
+
+/* =========================================
+   SCREEN → MAP COORDINATES
+   ========================================= */
+
+function screenToWorld(x,y){
+
+  const rect =
+    stage.getBoundingClientRect();
+
+
+  return {
+
+    x:
+      (x-rect.left-panX)/zoom,
+
+    y:
+      (y-rect.top-panY)/zoom
+
+  };
+
+}
+
+
+/* =========================================
+   MAP → SVG
+   ========================================= */
+
+function worldToSvg(point){
+
+  return {
+
+    x:
+      point.x /
+      content.offsetWidth *
+      1000,
+
+    y:
+      point.y /
+      content.offsetHeight *
+      1000
+
+  };
+
+}
+
+
+/* =========================================
+   MAP PAN
+   ========================================= */
+
+stage.addEventListener(
+  "pointerdown",
+  function(e){
+
+    if(drawing)return;
+
+    if(
+      e.target.closest(".zone")
+    )return;
+
+
+    if(
+      e.pointerType==="mouse" &&
+      e.button!==0
+    )return;
+
+
+    if(zoom>1){
+
+      mapPan=true;
+
+      lastX=e.clientX;
+
+      lastY=e.clientY;
+
+      stage.setPointerCapture(
+        e.pointerId
+      );
+
+    }
+
+  }
+);
+
+
+stage.addEventListener(
+  "pointermove",
+  function(e){
+
+    if(
+      mapPan &&
+      !drawing
+    ){
+
+      panX +=
+        e.clientX-lastX;
+
+      panY +=
+        e.clientY-lastY;
+
+
+      lastX=e.clientX;
+
+      lastY=e.clientY;
+
+
+      clampPan();
+
+      applyTransform();
+
+    }
+
+  }
+);
+
+
+stage.addEventListener(
+  "pointerup",
+  function(){
+
+    mapPan=false;
+
+  }
+);
+
+
+stage.addEventListener(
+  "pointercancel",
+  function(){
+
+    mapPan=false;
+
+  }
+);
+
+
+/* =========================================
+   ZONE DRAG
+   ========================================= */
+
+function makeZoneDraggable(
+  element,
+  id
+){
+
+  let active=false;
+
+
+  element.addEventListener(
+    "pointerdown",
+    function(e){
+
+      if(drawing)return;
+
+      active=true;
+
+      e.stopPropagation();
+
+      element.setPointerCapture(
+        e.pointerId
+      );
+
+    }
+  );
+
+
+  element.addEventListener(
+    "pointermove",
+    function(e){
+
+      if(!active)return;
+
+
+      const p =
+        screenToWorld(
+          e.clientX,
+          e.clientY
+        );
+
+
+      const x =
+        Math.max(
+          0,
+          Math.min(
+            100,
+            p.x/content.offsetWidth*100
+          )
+        );
+
+
+      const y =
+        Math.max(
+          0,
+          Math.min(
+            100,
+            p.y/content.offsetHeight*100
+          )
+        );
+
+
+      setZone(
+        id,
+        x,
+        y
+      );
+
+    }
+  );
+
+
+  element.addEventListener(
+    "pointerup",
+    function(){
+
+      active=false;
+
+    }
+  );
+
+
+  element.addEventListener(
+    "pointercancel",
+    function(){
+
+      active=false;
+
+    }
+  );
+
+}
+
+
+for(let i=1;i<=5;i++){
+
+  makeZoneDraggable(
+    document.getElementById("z"+i),
+    i
+  );
+
+}
+
+
+/* =========================================
+   DRAW MODE
+   ========================================= */
+
+function toggleDraw(){
+
+  drawing =
+    !drawing;
+
+
+  stage.classList.toggle(
+    "draw-mode",
+    drawing
+  );
+
+
+  document
+    .getElementById("drawBtn")
+    .classList.toggle(
+      "active",
+      drawing
+    );
+
+
+  document
+    .getElementById("drawBtn")
+    .textContent =
+      drawing
+        ? "✖ Stop Drawing"
+        : "➡️ Draw Arrow";
+
+
+  statusEl.textContent =
+    drawing
+      ? "DRAW MODE • Drag to create rotation arrows"
+      : "Training mode";
+
+}
+
+
+/* =========================================
+   SVG ELEMENT
+   ========================================= */
+
+function svgElement(
+  name,
+  attributes
+){
+
+  const element =
+    document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      name
+    );
+
+
+  for(
+    const key in attributes
+  ){
+
+    element.setAttribute(
+      key,
+      attributes[key]
+    );
+
+  }
+
+
+  return element;
+
+}
+
+
+/* =========================================
+   CREATE ARROW
+   ========================================= */
+
+function createArrow(
+  start,
+  end,
+  temporary=false
+){
+
+  const A =
+    worldToSvg(start);
+
+  const B =
+    worldToSvg(end);
+
+
+  const group =
+    svgElement(
+      "g",
+      {}
+    );
+
+
+  const line =
+    svgElement(
+      "line",
+      {
+        x1:A.x,
+        y1:A.y,
+        x2:B.x,
+        y2:B.y,
+        class:"arrow"
+      }
+    );
+
+
+  const angle =
+    Math.atan2(
+      B.y-A.y,
+      B.x-A.x
+    );
+
+
+  const length=22;
+
+
+  const p1={
+
+    x:
+      B.x -
+      length*
+      Math.cos(angle-.45),
+
+    y:
+      B.y -
+      length*
+      Math.sin(angle-.45)
+
+  };
+
+
+  const p2={
+
+    x:
+      B.x -
+      length*
+      Math.cos(angle+.45),
+
+    y:
+      B.y -
+      length*
+      Math.sin(angle+.45)
+
+  };
+
+
+  const head =
+    svgElement(
+      "polygon",
+      {
+
+        points:
+          `${B.x},${B.y} `+
+          `${p1.x},${p1.y} `+
+          `${p2.x},${p2.y}`,
+
+        class:"arrowHead"
+
+      }
+    );
+
+
+  group.appendChild(line);
+
+  group.appendChild(head);
+
+
+  if(temporary){
+
+    group.setAttribute(
+      "opacity",
+      ".6"
+    );
+
+  }
+
+
+  return group;
+
+}
+
+
+/* =========================================
+   DRAW POINTER EVENTS
+   ========================================= */
+
+drawLayer.addEventListener(
+  "pointerdown",
+  function(e){
+
+    if(!drawing)return;
+
+    e.preventDefault();
+
+
+    drawStart =
+      screenToWorld(
+        e.clientX,
+        e.clientY
+      );
+
+
+    preview =
+      createArrow(
+        drawStart,
+        drawStart,
+        true
+      );
+
+
+    drawLayer.appendChild(
+      preview
+    );
+
+
+    drawLayer.setPointerCapture(
+      e.pointerId
+    );
+
+  }
+);
+
+
+drawLayer.addEventListener(
+  "pointermove",
+  function(e){
+
+    if(
+      !drawing ||
+      !drawStart
+    )return;
+
+
+    const end =
+      screenToWorld(
+        e.clientX,
+        e.clientY
+      );
+
+
+    if(preview){
+
+      preview.remove();
+
+    }
+
+
+    preview =
+      createArrow(
+        drawStart,
+        end,
+        true
+      );
+
+
+    drawLayer.appendChild(
+      preview
+    );
+
+  }
+);
+
+
+drawLayer.addEventListener(
+  "pointerup",
+  function(e){
+
+    if(
+      !drawing ||
+      !drawStart
+    )return;
+
+
+    const end =
+      screenToWorld(
+        e.clientX,
+        e.clientY
+      );
+
+
+    if(preview){
+
+      preview.remove();
+
+    }
+
+
+    drawLayer.appendChild(
+      createArrow(
+        drawStart,
+        end,
+        false
+      )
+    );
+
+
+    drawStart=null;
+
+    preview=null;
+
+  }
+);
+
+
+drawLayer.addEventListener(
+  "pointercancel",
+  function(){
+
+    if(preview){
+
+      preview.remove();
+
+    }
+
+
+    drawStart=null;
+
+    preview=null;
+
+  }
+);
+
+
+/* =========================================
+   CLEAR DRAWINGS
+   ========================================= */
+
+function clearDrawings(){
+
+  while(
+    drawLayer.firstChild
+  ){
+
+    drawLayer.removeChild(
+      drawLayer.firstChild
+    );
+
+  }
+
+
+  drawStart=null;
+
+  preview=null;
+
+}
+
+
+/* =========================================
+   MOUSE WHEEL ZOOM
+   ========================================= */
+
+stage.addEventListener(
+  "wheel",
+  function(e){
+
+    e.preventDefault();
+
+
+    zoomBy(
+      e.deltaY<0
+        ? 1.15
+        : .87
+    );
+
+  },
+  {passive:false}
+);
+
+
+/* =========================================
+   MOBILE PINCH ZOOM
+   ========================================= */
+
+let pinchDistance=0;
+
+let pinchZoom=1;
+
+
+stage.addEventListener(
+  "touchstart",
+  function(e){
+
+    if(
+      drawing ||
+      e.touches.length!==2
+    )return;
+
+
+    e.preventDefault();
+
+
+    const a=e.touches[0];
+
+    const b=e.touches[1];
+
+
+    pinchDistance =
+      Math.hypot(
+        a.clientX-b.clientX,
+        a.clientY-b.clientY
+      );
+
+
+    pinchZoom=zoom;
+
+  },
+  {passive:false}
+);
+
+
+stage.addEventListener(
+  "touchmove",
+  function(e){
+
+    if(
+      drawing ||
+      e.touches.length!==2
+    )return;
+
+
+    e.preventDefault();
+
+
+    const a=e.touches[0];
+
+    const b=e.touches[1];
+
+
+    const distance =
+      Math.hypot(
+        a.clientX-b.clientX,
+        a.clientY-b.clientY
+      );
+
+
+    if(pinchDistance){
+
+      zoom =
+        Math.max(
+          1,
+          Math.min(
+            4,
+            pinchZoom*
+            distance/
+            pinchDistance
+          )
+        );
+
+
+      clampPan();
+
+      applyTransform();
+
+    }
+
+  },
+  {passive:false}
+);
+
+
+stage.addEventListener(
+  "touchend",
+  function(){
+
+    pinchDistance=0;
+
+  },
+  {passive:false}
+);
+
+
+/* =========================================
+   RESIZE
+   ========================================= */
+
+window.addEventListener(
+  "resize",
+  function(){
+
+    clampPan();
+
+    applyTransform();
+
+  }
+);
+
+
+img.addEventListener(
+  "load",
+  function(){
+
+    clampPan();
+
+    applyTransform();
+
+  }
+);
+
+
+/* =========================================
+   START
+   ========================================= */
+
+loadMap("bermuda");
+
 </script>
+
 </body>
 </html>
