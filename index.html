@@ -206,7 +206,6 @@ if(supabaseClient){
     await loadProfile();
   });
 }
-refreshAuth();
 
 const MAPS={bermuda:'bermuda.jpg',purgatory:'purgatory.jpg',kalahari:'kalahari.jpg',nexterra:'nexterra.jpg',solara:'solara.jpg'};
 const DEFAULT={z1:[48,48],z2:[56,43],z3:[47,57],z4:[61,59],z5:[51,36]};
@@ -303,5 +302,6 @@ $('#clearMarkers').onclick=clearMarkers;
 $('#saveScenario').onclick=()=>{localStorage.setItem('heoScenario',JSON.stringify({map:mapState.rot,pos:pos.rot,visible:visible.rot,notes:$('#notes').value,drawing:canvas.toDataURL(),markers:$('#markers').innerHTML}));$('#rStatus').textContent='💾 Scenario saved in this browser.'};
 $('#loadScenario').onclick=()=>{const raw=localStorage.getItem('heoScenario');if(!raw){$('#rStatus').textContent='No saved scenario found.';return}const d=JSON.parse(raw);if(d.map&&MAPS[d.map]){$$('.rmap').forEach(b=>b.classList.toggle('active',b.dataset.map===d.map));setMap('rot',d.map)}if(d.pos)Object.assign(pos.rot,d.pos);if(d.visible)Object.assign(visible.rot,d.visible);applyPos('rot');$('#notes').value=d.notes||'';$('#markers').innerHTML=d.markers||'';$$('.marker').forEach(m=>{m.onclick=ev=>{ev.stopPropagation();m.remove()}});restore(d.drawing||'');$('#rStatus').textContent='📂 Scenario loaded.';updateToolUI()};
 $('#clearScenario').onclick=()=>{localStorage.removeItem('heoScenario');$('#notes').value='';clearDrawing();clearMarkers();resetAll('rot');$('#rStatus').textContent='🗑 Scenario cleared.'};
+refreshAuth();
 fit('zone');fit('rot');setTimeout(resizeCanvas,50);
 </script></body></html>
