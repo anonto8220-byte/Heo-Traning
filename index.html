@@ -80,6 +80,8 @@ const SUPABASE_PUBLISHABLE_KEY='sb_publishable_3GxCb6UkFiXR7q57FppFkA_z_58vAH6';
 const supabaseClient=(window.supabase&&SUPABASE_PUBLISHABLE_KEY!=='PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE')
   ? window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY)
   : null;
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+function clone(o){return JSON.parse(JSON.stringify(o))}
 let authProfile=null,authSession=null,requestedPage=null;
 
 function isApprovedUser(){
@@ -193,12 +195,12 @@ async function updateUser(id){
   $('#adminMsg').textContent=error?error.message:'User updated.';
   if(!error)await loadUsers();
 }
-$('#loginBtn').onclick=()=>openAuth();
-$('#authClose').onclick=closeAuth;
-$('#signIn').onclick=login;
-$('#signUp').onclick=signup;
-$('#logoutBtn').onclick=logout;
-$('#adminRefresh').onclick=loadUsers;
+$('#loginBtn')?.addEventListener('click',()=>openAuth());
+$('#authClose')?.addEventListener('click',closeAuth);
+$('#signIn')?.addEventListener('click',login);
+$('#signUp')?.addEventListener('click',signup);
+$('#logoutBtn')?.addEventListener('click',logout);
+$('#adminRefresh')?.addEventListener('click',loadUsers);
 
 if(supabaseClient){
   supabaseClient.auth.onAuthStateChange(async (_event,session)=>{
@@ -212,8 +214,7 @@ const DEFAULT={z1:[48,48],z2:[56,43],z3:[47,57],z4:[61,59],z5:[51,36]};
 const SIZE={z1:.76,z2:.57,z3:.42,z4:.29,z5:.18};
 const state={zone:{zoom:1,x:0,y:0,w:0,h:0,locked:true},rot:{zoom:1,x:0,y:0,w:0,h:0,locked:true}};
 const pos={zone:clone(DEFAULT),rot:clone(DEFAULT)}; const visible={zone:{z1:true,z2:true,z3:true,z4:true,z5:true},rot:{z1:true,z2:true,z3:true,z4:true,z5:true}};
-const mapState={zone:'bermuda',rot:'bermuda'}; const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-function clone(o){return JSON.parse(JSON.stringify(o))}function world(view){return view==='zone'?$('#zWorld'):$('#rWorld')}function stage(view){return view==='zone'?$('#zStage'):$('#rStage')}function img(view){return view==='zone'?$('#zImg'):$('#rImg')}
+const mapState={zone:'bermuda',rot:'bermuda'};function world(view){return view==='zone'?$('#zWorld'):$('#rWorld')}function stage(view){return view==='zone'?$('#zStage'):$('#rStage')}function img(view){return view==='zone'?$('#zImg'):$('#rImg')}
 function fit(view){const st=stage(view),im=img(view),w=world(view);if(!im.naturalWidth)return;const r=st.getBoundingClientRect(),ratio=im.naturalWidth/im.naturalHeight;let W=r.width,H=W/ratio;if(H>r.height){H=r.height;W=H*ratio}state[view].w=W;state[view].h=H;w.style.width=W+'px';w.style.height=H+'px';const short=Math.min(W,H);w.querySelectorAll('.zone').forEach(z=>{const id=z.dataset.zone;const d=short*SIZE[id];z.style.width=d+'px';z.style.height=d+'px'});applyPos(view);applyTransform(view)}
 function applyPos(view){world(view).querySelectorAll('.zone').forEach(z=>{const id=z.dataset.zone;z.style.left=pos[view][id][0]+'%';z.style.top=pos[view][id][1]+'%';z.style.display=visible[view][id]?'flex':'none'})}
 function applyTransform(view){const s=state[view],w=world(view),z=$('#'+(view==='zone'?'zZoom':'rZoom'));w.style.transform=`translate(-50%,-50%) translate(${s.x}px,${s.y}px) scale(${s.zoom})`;z.textContent=s.zoom.toFixed(2)+'×'}
@@ -234,8 +235,8 @@ function setPage(p){
     if(p==='admin')loadUsers();
   },40);
 }
-$('#menuBtn').onclick=()=>$('#menu').classList.toggle('open');
-$$('[data-nav]').forEach(b=>b.onclick=()=>setPage(b.dataset.nav));
+$('#menuBtn')?.addEventListener('click',()=>$('#menu')?.classList.toggle('open'));
+$$('[data-nav]').forEach(b=>b.addEventListener('click',()=>setPage(b.dataset.nav)));
 $$('.zmap').forEach(b=>b.onclick=()=>{ $$('.zmap').forEach(x=>x.classList.remove('active'));b.classList.add('active');setMap('zone',b.dataset.map)});
 $$('.rmap').forEach(b=>b.onclick=()=>{ $$('.rmap').forEach(x=>x.classList.remove('active'));b.classList.add('active');setMap('rot',b.dataset.map)});
 function toggle(view,id){visible[view][id]=!visible[view][id];applyPos(view)}
@@ -302,6 +303,16 @@ $('#clearMarkers').onclick=clearMarkers;
 $('#saveScenario').onclick=()=>{localStorage.setItem('heoScenario',JSON.stringify({map:mapState.rot,pos:pos.rot,visible:visible.rot,notes:$('#notes').value,drawing:canvas.toDataURL(),markers:$('#markers').innerHTML}));$('#rStatus').textContent='💾 Scenario saved in this browser.'};
 $('#loadScenario').onclick=()=>{const raw=localStorage.getItem('heoScenario');if(!raw){$('#rStatus').textContent='No saved scenario found.';return}const d=JSON.parse(raw);if(d.map&&MAPS[d.map]){$$('.rmap').forEach(b=>b.classList.toggle('active',b.dataset.map===d.map));setMap('rot',d.map)}if(d.pos)Object.assign(pos.rot,d.pos);if(d.visible)Object.assign(visible.rot,d.visible);applyPos('rot');$('#notes').value=d.notes||'';$('#markers').innerHTML=d.markers||'';$$('.marker').forEach(m=>{m.onclick=ev=>{ev.stopPropagation();m.remove()}});restore(d.drawing||'');$('#rStatus').textContent='📂 Scenario loaded.';updateToolUI()};
 $('#clearScenario').onclick=()=>{localStorage.removeItem('heoScenario');$('#notes').value='';clearDrawing();clearMarkers();resetAll('rot');$('#rStatus').textContent='🗑 Scenario cleared.'};
-refreshAuth();
-fit('zone');fit('rot');setTimeout(resizeCanvas,50);
+async function initHEO(){
+  try{
+    await refreshAuth();
+    fit('zone');
+    fit('rot');
+    setTimeout(()=>{try{resizeCanvas()}catch(e){console.error('HEO resize init:',e)}},50);
+  }catch(e){
+    console.error('HEO initialization error:',e);
+    if($('#authMsg')) $('#authMsg').textContent='HEO loaded. Please try Login again.';
+  }
+}
+initHEO();
 </script></body></html>
