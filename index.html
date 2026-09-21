@@ -3,34 +3,14 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>HEO Training</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#030811;color:#edf8ff;font-family:Arial,sans-serif}body{min-height:100vh}button,textarea{font:inherit}button{border:1px solid #1a5d82;background:#081a2a;color:#fff;border-radius:8px;padding:8px 11px;font-weight:700;cursor:pointer;white-space:nowrap}button:hover,button.active{background:#0d3048;border-color:#36bfff}.app{width:min(1900px,100%);margin:auto;padding:7px}.top{height:58px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #123b56}.brand{display:flex;align-items:center;gap:9px}.brand img{width:44px;height:44px;object-fit:contain;border-radius:8px}.brand h1{margin:0;font-size:18px}.sub{font-size:9px;color:#55caff;font-weight:800}.page{display:none}.page.on{display:block}.home{min-height:calc(100vh - 75px);display:none;align-items:center;justify-content:center;text-align:center;padding:35px 15px}.home.on{display:flex}.homebox{width:min(760px,100%);padding:35px;border:1px solid #155275;border-radius:18px;background:#061421;box-shadow:0 20px 60px #0008}.homebox img{width:82px;height:82px;object-fit:contain;border-radius:14px;margin-bottom:12px}.homebox h2{font-size:34px;margin:4px 0 8px}.homebox .tag{color:#50caff;font-weight:800;letter-spacing:1px}.homebox section{text-align:left;margin-top:25px;padding:15px;border:1px solid #123b56;border-radius:12px;background:#04101b}.homebox h3{margin:0 0 7px;color:#59caff;font-size:15px}.homebox p,.homebox li{color:#b7cbd7;line-height:1.55;font-size:13px}.homebox ul{margin:7px 0 0;padding-left:20px}.bars{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;padding:6px;background:#061321;border:1px solid #123b56;border-radius:9px}.title{color:#55caff;font-size:11px;font-weight:900;margin:0 6px 0 2px}.bars button{font-size:11px;padding:7px 10px}.stage{position:relative;width:100%;height:calc(100vh - 190px);min-height:470px;margin-top:6px;background:#000;border:1px solid #1684ba;border-radius:11px;overflow:hidden;touch-action:pan-y}.viewport{position:absolute;inset:0;overflow:hidden}.world{position:absolute;left:50%;top:50%;transform-origin:center center;will-change:transform}.world img{display:block;width:100%;height:100%;object-fit:fill;user-select:none;pointer-events:none}.hud{position:absolute;z-index:30;top:8px;background:#02070ddd;border:1px solid #17648b;border-radius:6px;padding:5px 8px;font-size:10px;font-weight:900;pointer-events:none}.hud.left{left:8px}.hud.right{right:8px;color:#9bdfff}.zone{position:absolute;transform:translate(-50%,-50%);border:3px solid var(--c);border-radius:50%;background:rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;text-shadow:0 2px 4px #000;cursor:grab;touch-action:none;user-select:none;z-index:20}.zone.drag{cursor:grabbing}.z1{--c:#168cff}.z2{--c:#20d86a}.z3{--c:#ffd21a}.z4{--c:#ff405d}.z5{--c:#a855f7}.overlay{position:absolute;inset:0;z-index:40;pointer-events:none}.draw{position:absolute;left:0;top:0;z-index:50;pointer-events:none}.markers{position:absolute;left:0;top:0;width:100%;height:100%;z-index:60;pointer-events:none}.marker{position:absolute;transform:translate(-50%,-50%);font-size:25px;filter:drop-shadow(0 2px 3px #000);pointer-events:auto;cursor:pointer;user-select:none}.status{margin-top:6px;padding:8px 10px;background:#061522;border:1px solid #123b56;border-radius:8px;color:#8edbff;font-size:11px}.notes{width:100%;min-height:62px;background:#061522;color:#fff;border:1px solid #123b56;border-radius:8px;padding:8px;resize:vertical}.menu{position:fixed;right:10px;top:66px;z-index:200;display:none;width:220px;padding:8px;background:#061421;border:1px solid #1b6388;border-radius:12px;box-shadow:0 12px 35px #000b}.menu.open{display:block}.menu button{width:100%;text-align:left;margin:3px 0}.menu .sep{height:1px;background:#123b56;margin:7px 0}@media(max-width:700px){.app{padding:4px}.top{height:53px}.brand img{width:38px;height:38px}.brand h1{font-size:14px}.sub{font-size:7px}.stage{height:calc(100vh - 225px);min-height:430px}.zone{border-width:2px;font-size:10px}.homebox{padding:22px 15px}.homebox h2{font-size:27px}}
-
-.authbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.authbar .auth-user{font-size:10px;color:#9bdfff;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.authbar button{font-size:10px;padding:6px 9px}
-.auth-modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:#000b;padding:15px}
-.auth-modal.open{display:flex}
-.auth-box{width:min(390px,100%);background:#061421;border:1px solid #1b769f;border-radius:14px;padding:18px;box-shadow:0 20px 60px #000d}
-.auth-box h2{margin:0 0 12px;color:#59caff;font-size:20px}
-.auth-box input{width:100%;margin:5px 0;padding:10px;background:#030b13;color:#fff;border:1px solid #174c68;border-radius:8px;outline:none}
-.auth-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
-.auth-msg{font-size:11px;color:#9bdfff;line-height:1.45;margin-top:9px}
-.auth-close{float:right}
-.admin-panel{padding:12px 0}
-.admin-table-wrap{overflow:auto;border:1px solid #123b56;border-radius:9px}
-.admin-table{width:100%;border-collapse:collapse;font-size:11px;min-width:650px}
-.admin-table th,.admin-table td{padding:8px;border-bottom:1px solid #123b56;text-align:left}
-.admin-table th{color:#59caff;background:#061522}
-.admin-table select{background:#061522;color:#fff;border:1px solid #1a5d82;border-radius:6px;padding:5px}
-.lock-note{margin:10px 0;padding:10px;border:1px solid #7a4d1d;background:#1a1208;color:#ffd89b;border-radius:8px;font-size:11px}
 </style>
 </head>
 <body>
 <div class="app">
-<header class="top"><div class="brand"><img src="assets/heo-logo.jpg" alt="HEO"><div><h1>HEO TRAINING</h1><div class="sub">HIDDEN E-SPORTS ORGANISATION</div></div></div><div class="authbar"><span id="authUser" class="auth-user"></span><button id="loginBtn">🔐 Login</button><button id="logoutBtn" style="display:none">Logout</button><button id="menuBtn">☰ Main Menu</button></div></header>
-<div id="menu" class="menu"><button data-nav="home">🏠 Home</button><button data-nav="zone">🎯 Zone Prediction</button><button data-nav="rotation">🧭 Rotation Practice</button><button id="adminNav" data-nav="admin" style="display:none">👑 Admin Panel</button></div>
+<header class="top"><div class="brand"><img src="assets/heo-logo.jpg" alt="HEO"><div><h1>HEO TRAINING</h1><div class="sub">HIDDEN E-SPORTS ORGANISATION</div></div></div><button id="menuBtn">☰ Main Menu</button></header>
+<div id="menu" class="menu"><button data-nav="home">🏠 Home</button><button data-nav="zone">🎯 Zone Prediction</button><button data-nav="rotation">🧭 Rotation Practice</button></div>
 <section id="home" class="page home on"><div class="homebox"><img src="assets/heo-logo.jpg" alt="HEO"><h2>HEO TRAINING</h2><div class="tag">PLAY • PREDICT • IMPROVE</div><section><h3>What is HEO Training?</h3><p>A dedicated training platform for HEO players to practice zone prediction, rotations, positioning, routes and tactical decision-making.</p></section><section><h3>How to Use</h3><ul><li>Open Zone Prediction to practice the 1st–5th zones.</li><li>Open Rotation Practice to mark routes, enemies, danger areas and team positions.</li><li>Use Move / Fix mode and map zoom/pan according to the exercise.</li></ul></section><section><h3>Benefits</h3><ul><li>Improve zone reading and rotation planning.</li><li>Practice team movement before tournament matches.</li><li>Build repeatable tactical decisions.</li></ul></section></div></section>
 <section id="zone" class="page">
 <div class="bars"><span class="title">MAPS</span><button class="zmap active" data-map="bermuda">Bermuda</button><button class="zmap" data-map="purgatory">Purgatory</button><button class="zmap" data-map="kalahari">Kalahari</button><button class="zmap" data-map="nexterra">NeXTerra</button><button class="zmap" data-map="solara">Solara</button></div>
@@ -49,194 +29,24 @@
 <div class="bars"><span class="title">NOTES</span><textarea id="notes" class="notes" placeholder="Write rotation, enemy, danger or IGL notes..."></textarea></div>
 <div class="status" id="rStatus">🔒 Fix Zone • Select a drawing tool, then draw on the map. Select a marker, then click the map.</div>
 </section>
-
-<section id="admin" class="page">
-  <div class="bars"><span class="title">ADMIN PANEL</span><button id="adminRefresh">↻ Refresh Users</button></div>
-  <div class="lock-note">Admin can manage account status and role. Passwords are never shown or editable here.</div>
-  <div id="adminMsg" class="status">Loading users...</div>
-  <div class="admin-panel"><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Status</th><th>Created</th><th>Save</th></tr></thead><tbody id="userRows"></tbody></table></div></div>
-</section>
-
-<div id="authModal" class="auth-modal" aria-hidden="true">
-  <div class="auth-box">
-    <button type="button" id="authClose" class="auth-close">✕</button>
-    <h2>HEO Account</h2>
-    <input id="authEmail" type="email" placeholder="Email" autocomplete="email">
-    <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password">
-    <input id="authName" type="text" placeholder="Display name (for sign up)" autocomplete="name">
-    <div class="auth-actions">
-      <button type="button" id="signIn">🔐 Login</button>
-      <button type="button" id="signUp">📝 Sign Up</button>
-    </div>
-    <div id="authMsg" class="auth-msg"></div>
-  </div>
-</div>
 </div>
 <script>
 'use strict';
-/* HEO AUTH SECURITY LAYER — does not modify map/zone/drawing/marker logic. */
-const SUPABASE_URL='https://eyqbssqaigkevessqthr.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY='sb_publishable_3GxCb6UkFiXR7q57FppFkA_z_58vAH6';
-const supabaseClient=(window.supabase&&SUPABASE_PUBLISHABLE_KEY!=='PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE')
-  ? window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY)
-  : null;
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-function clone(o){return JSON.parse(JSON.stringify(o))}
-let authProfile=null,authSession=null,requestedPage=null;
-
-function isApprovedUser(){
-  return !!(authSession&&authProfile&&authProfile.status==='approved');
-}
-function isAdminUser(){
-  return !!(isApprovedUser()&&authProfile.role==='admin');
-}
-function openAuth(target){
-  requestedPage=target||null;
-  $('#authModal').classList.add('open');
-  $('#authModal').setAttribute('aria-hidden','false');
-  if(!supabaseClient){
-    $('#authMsg').textContent='Supabase publishable key is not configured yet.';
-  }else{
-    $('#authMsg').textContent='Login with your approved HEO account. New accounts require admin approval.';
-  }
-}
-function closeAuth(){
-  $('#authModal').classList.remove('open');
-  $('#authModal').setAttribute('aria-hidden','true');
-}
-function authText(){
-  if(!authSession){
-    $('#authUser').textContent='';
-    $('#loginBtn').style.display='';
-    $('#logoutBtn').style.display='none';
-    $('#adminNav').style.display='none';
-    return;
-  }
-  $('#authUser').textContent=authSession.user.email||'';
-  $('#loginBtn').style.display='none';
-  $('#logoutBtn').style.display='';
-  $('#adminNav').style.display=isAdminUser()?'':'none';
-}
-async function loadProfile(){
-  if(!supabaseClient||!authSession){authProfile=null;authText();return}
-  const {data,error}=await supabaseClient.from('profiles').select('id,email,full_name,role,status,created_at').eq('id',authSession.user.id).maybeSingle();
-  if(error){authProfile=null;authText();return}
-  authProfile=data||null;
-  authText();
-}
-async function refreshAuth(){
-  if(!supabaseClient){authText();return}
-  const {data}=await supabaseClient.auth.getSession();
-  authSession=data.session||null;
-  await loadProfile();
-}
-async function login(){
-  if(!supabaseClient){openAuth();return}
-  const email=$('#authEmail').value.trim(),password=$('#authPassword').value;
-  if(!email||!password){$('#authMsg').textContent='Enter your email and password.';return}
-  $('#authMsg').textContent='Logging in...';
-  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
-  if(error){$('#authMsg').textContent=error.message;return}
-  authSession=data.session;
-  await loadProfile();
-  if(!isApprovedUser()){
-    await supabaseClient.auth.signOut();
-    authSession=null;authProfile=null;authText();
-    $('#authMsg').textContent='Your account is not approved yet. Please wait for an HEO admin.';
-    return;
-  }
-  closeAuth();
-  if(requestedPage){const p=requestedPage;requestedPage=null;setPage(p)}
-}
-async function signup(){
-  if(!supabaseClient){openAuth();return}
-  const email=$('#authEmail').value.trim(),password=$('#authPassword').value,name=$('#authName').value.trim();
-  if(!email||!password){$('#authMsg').textContent='Enter an email and password.';return}
-  if(password.length<6){$('#authMsg').textContent='Password must be at least 6 characters.';return}
-  $('#authMsg').textContent='Creating account...';
-  const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name:name}}});
-  if(error){$('#authMsg').textContent=error.message;return}
-  if(data.session){
-    authSession=data.session;await loadProfile();
-    await supabaseClient.auth.signOut();authSession=null;authProfile=null;authText();
-  }
-  $('#authMsg').textContent='Account created. It is pending HEO admin approval. If email confirmation is enabled, confirm your email first.';
-}
-async function logout(){
-  if(supabaseClient) await supabaseClient.auth.signOut();
-  authSession=null;authProfile=null;authText();setPage('home');
-}
-async function loadUsers(){
-  if(!isAdminUser())return;
-  $('#adminMsg').textContent='Loading users...';
-  const {data,error}=await supabaseClient.from('profiles').select('id,email,full_name,role,status,created_at').order('created_at',{ascending:true});
-  if(error){$('#adminMsg').textContent=error.message;return}
-  const rows=$('#userRows');rows.innerHTML='';
-  (data||[]).forEach(u=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML='<td>'+escapeHtml(u.email||'')+'</td><td>'+escapeHtml(u.full_name||'')+'</td>'+
-      '<td><select data-role="'+u.id+'"><option value="user">user</option><option value="admin">admin</option></select></td>'+
-      '<td><select data-status="'+u.id+'"><option value="pending">pending</option><option value="approved">approved</option><option value="disabled">disabled</option></select></td>'+
-      '<td>'+new Date(u.created_at).toLocaleString()+'</td><td><button type="button" data-save="'+u.id+'">Save</button></td>';
-    rows.appendChild(tr);
-    tr.querySelector('[data-role]').value=u.role;
-    tr.querySelector('[data-status]').value=u.status;
-  });
-  $('#adminMsg').textContent=(data||[]).length+' user(s) loaded.';
-  rows.querySelectorAll('[data-save]').forEach(btn=>btn.onclick=()=>updateUser(btn.dataset.save));
-}
-function escapeHtml(v){
-  return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-async function updateUser(id){
-  if(!isAdminUser())return;
-  const role=$('[data-role="'+id+'"]').value,status=$('[data-status="'+id+'"]').value;
-  const {error}=await supabaseClient.from('profiles').update({role,status}).eq('id',id);
-  $('#adminMsg').textContent=error?error.message:'User updated.';
-  if(!error)await loadUsers();
-}
-$('#loginBtn')?.addEventListener('click',()=>openAuth());
-$('#authClose')?.addEventListener('click',closeAuth);
-$('#signIn')?.addEventListener('click',login);
-$('#signUp')?.addEventListener('click',signup);
-$('#logoutBtn')?.addEventListener('click',logout);
-$('#adminRefresh')?.addEventListener('click',loadUsers);
-
-if(supabaseClient){
-  supabaseClient.auth.onAuthStateChange(async (_event,session)=>{
-    authSession=session||null;
-    await loadProfile();
-  });
-}
-
 const MAPS={bermuda:'bermuda.jpg',purgatory:'purgatory.jpg',kalahari:'kalahari.jpg',nexterra:'nexterra.jpg',solara:'solara.jpg'};
 const DEFAULT={z1:[48,48],z2:[56,43],z3:[47,57],z4:[61,59],z5:[51,36]};
 const SIZE={z1:.76,z2:.57,z3:.42,z4:.29,z5:.18};
 const state={zone:{zoom:1,x:0,y:0,w:0,h:0,locked:true},rot:{zoom:1,x:0,y:0,w:0,h:0,locked:true}};
 const pos={zone:clone(DEFAULT),rot:clone(DEFAULT)}; const visible={zone:{z1:true,z2:true,z3:true,z4:true,z5:true},rot:{z1:true,z2:true,z3:true,z4:true,z5:true}};
-const mapState={zone:'bermuda',rot:'bermuda'};function world(view){return view==='zone'?$('#zWorld'):$('#rWorld')}function stage(view){return view==='zone'?$('#zStage'):$('#rStage')}function img(view){return view==='zone'?$('#zImg'):$('#rImg')}
+const mapState={zone:'bermuda',rot:'bermuda'}; const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+function clone(o){return JSON.parse(JSON.stringify(o))}function world(view){return view==='zone'?$('#zWorld'):$('#rWorld')}function stage(view){return view==='zone'?$('#zStage'):$('#rStage')}function img(view){return view==='zone'?$('#zImg'):$('#rImg')}
 function fit(view){const st=stage(view),im=img(view),w=world(view);if(!im.naturalWidth)return;const r=st.getBoundingClientRect(),ratio=im.naturalWidth/im.naturalHeight;let W=r.width,H=W/ratio;if(H>r.height){H=r.height;W=H*ratio}state[view].w=W;state[view].h=H;w.style.width=W+'px';w.style.height=H+'px';const short=Math.min(W,H);w.querySelectorAll('.zone').forEach(z=>{const id=z.dataset.zone;const d=short*SIZE[id];z.style.width=d+'px';z.style.height=d+'px'});applyPos(view);applyTransform(view)}
 function applyPos(view){world(view).querySelectorAll('.zone').forEach(z=>{const id=z.dataset.zone;z.style.left=pos[view][id][0]+'%';z.style.top=pos[view][id][1]+'%';z.style.display=visible[view][id]?'flex':'none'})}
 function applyTransform(view){const s=state[view],w=world(view),z=$('#'+(view==='zone'?'zZoom':'rZoom'));w.style.transform=`translate(-50%,-50%) translate(${s.x}px,${s.y}px) scale(${s.zoom})`;z.textContent=s.zoom.toFixed(2)+'×'}
 function resetView(view){Object.assign(state[view],{zoom:1,x:0,y:0});fit(view)}
 function resetAll(view){pos[view]=clone(DEFAULT);Object.keys(visible[view]).forEach(k=>visible[view][k]=true);resetView(view)}
 function setMap(view,key){mapState[view]=key;img(view).src='maps/'+MAPS[key];$('#'+(view==='zone'?'zLabel':'rLabel')).textContent=key.toUpperCase()+(view==='zone'?' • ZONE PREDICTION':' • ROTATION PRACTICE');resetAll(view)}
-function setPage(p){
-  if((p==='zone'||p==='rotation'||p==='admin') && !isApprovedUser()){
-    openAuth(p);
-    return;
-  }
-  $$('.page').forEach(x=>x.classList.remove('on'));
-  $('#'+p).classList.add('on');
-  $('#menu').classList.remove('open');
-  setTimeout(()=>{
-    if(p==='zone')fit('zone');
-    if(p==='rotation'){fit('rot');resizeCanvas()}
-    if(p==='admin')loadUsers();
-  },40);
-}
-$('#menuBtn')?.addEventListener('click',()=>$('#menu')?.classList.toggle('open'));
-$$('[data-nav]').forEach(b=>b.addEventListener('click',()=>setPage(b.dataset.nav)));
+function setPage(p){$$('.page').forEach(x=>x.classList.remove('on'));$('#'+p).classList.add('on');$('#menu').classList.remove('open');$('#menuBtn').textContent=p==='home'?'☰ Main Menu':'☰ Main Menu';setTimeout(()=>{if(p==='zone')fit('zone');if(p==='rotation'){fit('rot');resizeCanvas()}},40)}
+$('#menuBtn').onclick=()=>$('#menu').classList.toggle('open');$$('[data-nav]').forEach(b=>b.onclick=()=>setPage(b.dataset.nav));
 $$('.zmap').forEach(b=>b.onclick=()=>{ $$('.zmap').forEach(x=>x.classList.remove('active'));b.classList.add('active');setMap('zone',b.dataset.map)});
 $$('.rmap').forEach(b=>b.onclick=()=>{ $$('.rmap').forEach(x=>x.classList.remove('active'));b.classList.add('active');setMap('rot',b.dataset.map)});
 function toggle(view,id){visible[view][id]=!visible[view][id];applyPos(view)}
@@ -303,16 +113,5 @@ $('#clearMarkers').onclick=clearMarkers;
 $('#saveScenario').onclick=()=>{localStorage.setItem('heoScenario',JSON.stringify({map:mapState.rot,pos:pos.rot,visible:visible.rot,notes:$('#notes').value,drawing:canvas.toDataURL(),markers:$('#markers').innerHTML}));$('#rStatus').textContent='💾 Scenario saved in this browser.'};
 $('#loadScenario').onclick=()=>{const raw=localStorage.getItem('heoScenario');if(!raw){$('#rStatus').textContent='No saved scenario found.';return}const d=JSON.parse(raw);if(d.map&&MAPS[d.map]){$$('.rmap').forEach(b=>b.classList.toggle('active',b.dataset.map===d.map));setMap('rot',d.map)}if(d.pos)Object.assign(pos.rot,d.pos);if(d.visible)Object.assign(visible.rot,d.visible);applyPos('rot');$('#notes').value=d.notes||'';$('#markers').innerHTML=d.markers||'';$$('.marker').forEach(m=>{m.onclick=ev=>{ev.stopPropagation();m.remove()}});restore(d.drawing||'');$('#rStatus').textContent='📂 Scenario loaded.';updateToolUI()};
 $('#clearScenario').onclick=()=>{localStorage.removeItem('heoScenario');$('#notes').value='';clearDrawing();clearMarkers();resetAll('rot');$('#rStatus').textContent='🗑 Scenario cleared.'};
-async function initHEO(){
-  try{
-    await refreshAuth();
-    fit('zone');
-    fit('rot');
-    setTimeout(()=>{try{resizeCanvas()}catch(e){console.error('HEO resize init:',e)}},50);
-  }catch(e){
-    console.error('HEO initialization error:',e);
-    if($('#authMsg')) $('#authMsg').textContent='HEO loaded. Please try Login again.';
-  }
-}
-initHEO();
+fit('zone');fit('rot');setTimeout(resizeCanvas,50);
 </script></body></html>
