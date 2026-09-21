@@ -119,7 +119,7 @@ function authText(){
 }
 async function loadProfile(){
   if(!supabaseClient||!authSession){authProfile=null;authText();return}
-  const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at').eq('id',authSession.user.id).maybeSingle();
+  const {data,error}=await supabaseClient.from('profiles').select('id,email,full_name,role,status,created_at').eq('id',authSession.user.id).maybeSingle();
   if(error){authProfile=null;authText();return}
   authProfile=data||null;
   authText();
@@ -154,7 +154,7 @@ async function signup(){
   if(!email||!password){$('#authMsg').textContent='Enter an email and password.';return}
   if(password.length<6){$('#authMsg').textContent='Password must be at least 6 characters.';return}
   $('#authMsg').textContent='Creating account...';
-  const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{display_name:name}}});
+  const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name:name}}});
   if(error){$('#authMsg').textContent=error.message;return}
   if(data.session){
     authSession=data.session;await loadProfile();
@@ -169,12 +169,12 @@ async function logout(){
 async function loadUsers(){
   if(!isAdminUser())return;
   $('#adminMsg').textContent='Loading users...';
-  const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at').order('created_at',{ascending:true});
+  const {data,error}=await supabaseClient.from('profiles').select('id,email,full_name,role,status,created_at').order('created_at',{ascending:true});
   if(error){$('#adminMsg').textContent=error.message;return}
   const rows=$('#userRows');rows.innerHTML='';
   (data||[]).forEach(u=>{
     const tr=document.createElement('tr');
-    tr.innerHTML='<td>'+escapeHtml(u.email||'')+'</td><td>'+escapeHtml(u.display_name||'')+'</td>'+
+    tr.innerHTML='<td>'+escapeHtml(u.email||'')+'</td><td>'+escapeHtml(u.full_name||'')+'</td>'+
       '<td><select data-role="'+u.id+'"><option value="user">user</option><option value="admin">admin</option></select></td>'+
       '<td><select data-status="'+u.id+'"><option value="pending">pending</option><option value="approved">approved</option><option value="disabled">disabled</option></select></td>'+
       '<td>'+new Date(u.created_at).toLocaleString()+'</td><td><button type="button" data-save="'+u.id+'">Save</button></td>';
