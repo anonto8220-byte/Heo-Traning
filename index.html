@@ -96,7 +96,7 @@
 
 'use strict';
 
-const CONTACTS={facebook:'PASTE_HEO_FACEBOOK_PAGE_URL',whatsapp:'PASTE_HEO_WHATSAPP_CHANNEL_URL',email:'anonto8220@gmail.com'};
+const CONTACTS={facebook:'https://www.facebook.com/share/1Ds1jMPm1h/',whatsapp:'https://wa.me/8801323391891',email:'anonto8220@gmail.com'};
 function applyContacts(){if(CONTACTS.facebook.startsWith('http'))$('#facebookLink').href=CONTACTS.facebook;else $('#facebookLink').onclick=()=>{alert('Add HEO Facebook Page URL in CONTACTS at the top of index.html.');return false};if(CONTACTS.whatsapp.startsWith('http'))$('#whatsappLink').href=CONTACTS.whatsapp;else $('#whatsappLink').onclick=()=>{alert('Add HEO WhatsApp Channel URL in CONTACTS at the top of index.html.');return false};if(CONTACTS.email.includes('@'))$('#emailLink').href='mailto:'+CONTACTS.email;else $('#emailLink').onclick=()=>{alert('Add HEO email address in CONTACTS at the top of index.html.');return false}}
 
 const MAPS={bermuda:'bermuda.jpg',purgatory:'purgatory.jpg',kalahari:'kalahari.jpg',nexterra:'nexterra.jpg',solara:'solara.jpg'};
