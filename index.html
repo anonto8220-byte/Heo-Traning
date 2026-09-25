@@ -190,7 +190,7 @@ function resizeCanvas(){
 }
 function cp(e){const r=canvas.getBoundingClientRect(),z=state.rot.zoom||1;return{x:(e.clientX-r.left)/z,y:(e.clientY-r.top)/z}}
 function saveSnap(){history.push(canvas.toDataURL());if(history.length>50)history.shift();future=[]}
-function restore(src){ctx.clearRect(0,0,state.rot.w||canvas.clientWidth,state.rot.h||canvas.clientHeight);if(!src)return;const im=new Image();im.crossOrigin='anonymous';im.onload=()=>ctx.drawImage(im,0,0,state.rot.w||canvas.clientWidth,state.rot.h||canvas.clientHeight);im.src=src}
+function restore(src){ctx.clearRect(0,0,state.rot.w||canvas.clientWidth,state.rot.h||canvas.clientHeight);if(!src)return;const im=new Image();im.onload=()=>ctx.drawImage(im,0,0,state.rot.w||canvas.clientWidth,state.rot.h||canvas.clientHeight);im.src=src}
 function clearDrawing(){ctx.clearRect(0,0,state.rot.w||canvas.clientWidth,state.rot.h||canvas.clientHeight);history=[];future=[];drawMode=null;canvas.style.pointerEvents='none';updateToolUI();$('#rStatus').textContent='Drawing cleared.'}
 function updateToolUI(){
   ['free','arrow','route','circle','box','eraser'].forEach(id=>$('#'+id)?.classList.toggle('active',drawMode===({free:'free',arrow:'arrow',route:'line',circle:'circle',box:'box',eraser:'eraser'}[id])));
@@ -271,7 +271,23 @@ async function secureSetPage(p){if(p==='admin'&&!admin()){openAuth('login');retu
 
 function showStatus(msg){$('#authMsg').textContent=msg}
 
-async function loadProfile(){if(!supabaseClient)return;const {data:{user}}=await supabaseClient.auth.getUser();currentUser=user||null;currentProfile=null;if(user){const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at').eq('id',user.id).maybeSingle();if(!error)currentProfile=data}updateAuthUI();}
+async function loadProfile(){
+  if(!supabaseClient)return;
+  const {data:{user},error:authError}=await supabaseClient.auth.getUser();
+  currentUser=user||null; currentProfile=null;
+  if(authError){showStatus(authError.message);updateAuthUI();return;}
+  if(user){
+    let q=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at').eq('id',user.id).maybeSingle();
+    if(q.error){showStatus('Profile load failed: '+q.error.message);}
+    else if(q.data){currentProfile=q.data;}
+    else {
+      const ins=await supabaseClient.from('profiles').insert({id:user.id,email:user.email||'',display_name:user.user_metadata?.display_name||'',role:'user',status:'pending'}).select('id,email,display_name,role,status,created_at').single();
+      if(!ins.error) currentProfile=ins.data; else showStatus('Profile not found: '+ins.error.message);
+    }
+  }
+  updateAuthUI();
+  if(admin()) $('#adminNav').style.display='block';
+}
 
 async function doAuth(){if(!authReady()){showStatus('Add your Supabase publishable key to the HTML first.');return}const email=$('#authEmail').value.trim(),password=$('#authPassword').value;if(!email||!password){showStatus('Enter email and password.');return}if(authMode==='login'){const {error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){showStatus(error.message);return}await loadProfile();closeAuth();if(currentProfile?.status==='disabled'){showStatus('This account is disabled.');await supabaseClient.auth.signOut();await loadProfile();openAuth('login');return}if(currentProfile?.status!=='approved'){originalSetPage('home');alert('Login successful, but your account is pending admin approval.')}else originalSetPage('home')}else{const {data,error}=await supabaseClient.auth.signUp({email,password});if(error){showStatus(error.message);return}showStatus(data.session?'Account created. Wait for approval.':'Account created. Check your email if confirmation is enabled, then wait for admin approval.');authMode='login';$('#authTitle').textContent='Login';$('#authSubmit').textContent='Login';$('#switchAuth').textContent='Create account';}}
 
@@ -280,32 +296,9 @@ async function forgotPassword(){if(!authReady()){showStatus('Add your Supabase p
 async function doLogout(){if(supabaseClient)await supabaseClient.auth.signOut();currentUser=null;currentProfile=null;updateAuthUI();if($('#adminNav'))$('#adminNav').style.display='none';if($('#adminTools'))$('#adminTools').style.display='none';originalSetPage('home')}
 
 let userCache=[];
-async function loadUsers(){
-  if(!admin()||!supabaseClient)return;
-  const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at').order('created_at',{ascending:false});
-  const body=$('#userRows');
-  if(error){body.innerHTML='';$('#adminMsg').textContent='User load failed: '+error.message;return}
-  userCache=data||[];renderUsers($('#userSearch')?.value||'');
-}
-function renderUsers(q=''){
-  const body=$('#userRows');if(!body)return;
-  const needle=String(q).trim().toLowerCase();
-  const data=userCache.filter(u=>!needle||String(u.email||'').toLowerCase().includes(needle));
-  body.innerHTML='';
-  for(const u of data){
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${escapeHtml(u.email||'')}</td><td>${escapeHtml(u.display_name||'')}</td><td><select data-id="${u.id}" data-field="role"><option value="user" ${u.role==='user'?'selected':''}>user</option><option value="admin" ${u.role==='admin'?'selected':''}>admin</option></select></td><td><select data-id="${u.id}" data-field="status"><option value="pending" ${u.status==='pending'?'selected':''}>pending</option><option value="approved" ${u.status==='approved'?'selected':''}>approved</option><option value="disabled" ${u.status==='disabled'?'selected':''}>disabled</option></select></td><td><button data-save="${u.id}">Save</button></td>`;
-    body.appendChild(tr);
-  }
-  $('#adminMsg').textContent=`Showing ${data.length} of ${userCache.length} account(s).`;
-}
-async function saveUser(id){
-  if(!admin())return;
-  const role=document.querySelector(`select[data-id="${id}"][data-field="role"]`).value;
-  const status=document.querySelector(`select[data-id="${id}"][data-field="status"]`).value;
-  const {error}=await supabaseClient.from('profiles').update({role,status}).eq('id',id);
-  if(error)$('#adminMsg').textContent=error.message;else{await loadUsers();$('#adminMsg').textContent='User updated.'}
-}
+async function loadUsers(){if(!admin()||!supabaseClient)return;const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at').order('created_at',{ascending:false});const body=$('#userRows');if(error){body.innerHTML='';$('#adminMsg').textContent=error.message;return}userCache=data||[];renderUsers($('#userSearch')?.value||'')}
+function renderUsers(q=''){const body=$('#userRows');if(!body)return;const needle=String(q).trim().toLowerCase();const data=userCache.filter(u=>!needle||String(u.email||'').toLowerCase().includes(needle));body.innerHTML='';for(const u of data){const tr=document.createElement('tr');tr.innerHTML=`<td>${escapeHtml(u.email||'')}</td><td>${escapeHtml(u.display_name||'')}</td><td><select data-id="${u.id}" data-field="role"><option value="user" ${u.role==='user'?'selected':''}>user</option><option value="admin" ${u.role==='admin'?'selected':''}>admin</option></select></td><td><select data-id="${u.id}" data-field="status"><option value="pending" ${u.status==='pending'?'selected':''}>pending</option><option value="approved" ${u.status==='approved'?'selected':''}>approved</option><option value="disabled" ${u.status==='disabled'?'selected':''}>disabled</option></select></td><td><button data-save="${u.id}">Save</button></td>`;body.appendChild(tr)}$('#adminMsg').textContent=`Showing ${data.length} of ${userCache.length} account(s).`}
+async function saveUser(id){if(!admin())return;const role=document.querySelector(`select[data-id="${id}"][data-field="role"]`).value,status=document.querySelector(`select[data-id="${id}"][data-field="status"]`).value;const {error}=await supabaseClient.from('profiles').update({role,status}).eq('id',id);if(error)$('#adminMsg').textContent=error.message;else{await loadUsers();$('#adminMsg').textContent='User updated.'}}
 
 $('#loginBtn').onclick=()=>openAuth('login');$('#logoutBtn').onclick=doLogout;$('#closeAuth').onclick=closeAuth;$('#authSubmit').onclick=doAuth;$('#forgotBtn').onclick=forgotPassword;$('#switchAuth').onclick=()=>openAuth(authMode==='login'?'signup':'login');$('#userRows').addEventListener('click',e=>{const b=e.target.closest('[data-save]');if(b)saveUser(b.dataset.save)});$('#userSearch')?.addEventListener('input',e=>renderUsers(e.target.value));$('#userSearchClear')?.addEventListener('click',()=>{if($('#userSearch'))$('#userSearch').value='';renderUsers('')});
 
@@ -321,7 +314,8 @@ const oldSetPage2=originalSetPage;
 function esc(v){return escapeHtml(v)}
 function escAttr(v){return escapeHtml(v)}
 function sortRows(rows){return [...rows].sort((a,b)=>(Number(b.tp)||0)-(Number(a.tp)||0)||(Number(b.win)||0)-(Number(a.win)||0)||(Number(b.kp)||0)-(Number(a.kp)||0))}
-function featureAllowed(feature){if(admin())return true;if(feature==='academic'||feature==='zone'||feature==='rotation')return approved();return false}
+function currentAccess(){return {academic:approved(),zone:approved(),rotation:approved(),pointTable:true,tournaments:true,designStudio:admin()}}
+function featureAllowed(feature){if(feature==='academic'||feature==='zone'||feature==='rotation')return approved();if(feature==='designStudio')return admin();return true}
 function applyUserHubAccess(){}
 async function goPage(p){
   if(p==='admin'&&!admin()){openAuth('login');return}
@@ -339,11 +333,26 @@ $('#academicLogin')?.addEventListener('click',()=>openAuth('login'));
 $$('[data-org]').forEach(b=>b.onclick=async()=>{const key=b.dataset.org;if(key==='pointTable')await renderPublicPointTable();else if(key==='tournaments')await renderPublicTournaments();else $('#orgContent').innerHTML='<h3>'+esc(ORG_SECTIONS[key])+'</h3><p class="status">This public section is ready for future HEO content.</p>'});
 
 async function getPointRows(){if(!supabaseClient)return [];const {data,error}=await supabaseClient.from('pt_entries').select('*').order('created_at',{ascending:false});if(error){console.error(error);return []}return data||[]}
-async function loadTournaments(){if(!admin()||!supabaseClient)return;const {data,error}=await supabaseClient.from('heo_tournaments').select('*').order('created_at',{ascending:false});if(error){$('#tournamentList').innerHTML='<div class="status">'+esc(error.message)+'</div>';return}tournamentCache=data||[];renderTournamentList();fillTournamentSelects();}
+async function loadTournaments(){
+  const box=$('#tournamentList');
+  if(!supabaseClient){if(box)box.innerHTML='<div class="status">Supabase is not configured.</div>';return;}
+  if(!admin()){if(box)box.innerHTML='<div class="status">Admin approval is required.</div>';return;}
+  if(box)box.innerHTML='<div class="status">Loading tournaments...</div>';
+  const {data,error}=await supabaseClient.from('heo_tournaments').select('*').order('created_at',{ascending:false});
+  if(error){if(box)box.innerHTML='<div class="status">'+esc(error.message)+'</div>';return;}
+  tournamentCache=data||[]; renderTournamentList(); fillTournamentSelects();
+}
 function fillTournamentSelects(){const els=[$('#ptTournament'),$('#bannerTournament')];els.forEach(sel=>{if(!sel)return;const old=sel.value;sel.innerHTML='<option value="">Select tournament</option>'+tournamentCache.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');if(tournamentCache.some(t=>t.id===old))sel.value=old})}
 function tournamentById(id){return tournamentCache.find(t=>t.id===id)}
 function renderTournamentList(){const box=$('#tournamentList');if(!box)return;if(!tournamentCache.length){box.innerHTML='<div class="status">No tournaments yet.</div>';return}box.innerHTML=tournamentCache.map(t=>`<div class="tournamentRow"><b>${esc(t.name)}</b><div class="status">Round ${esc(t.round||'—')} • Day ${esc(t.day||'—')} • Week ${esc(t.week||'—')}</div><div id="tTeams-${t.id}" class="teamEntryRow">Loading teams...</div><div style="margin-top:8px"><button class="mini" onclick="openTeamModal('${t.id}')">+ Add Team</button> <button class="mini" onclick="openTournamentTeams('${t.id}')">Refresh Teams</button> <button class="mini" onclick="deleteTournament('${t.id}')">Delete Tournament</button></div></div>`).join('');tournamentCache.forEach(t=>openTournamentTeams(t.id));}
-async function openTournamentTeams(tid){const box=$('#tTeams-'+tid);if(!box)return;const {data,error}=await supabaseClient.from('heo_tournament_teams').select('id,team_id,heo_teams(id,team_name,logo_url)').eq('tournament_id',tid).order('created_at');if(error){box.innerHTML='<span class="status">'+esc(error.message)+'</span>';return}box.innerHTML=(data||[]).map(x=>`<span style="display:inline-flex;align-items:center;gap:6px;margin:3px 8px 3px 0">${x.heo_teams?.logo_url?`<img src="${escAttr(x.heo_teams.logo_url)}" style="width:26px;height:26px;object-fit:contain;border-radius:5px">`:''}<b>${esc(x.heo_teams?.team_name||'')}</b><button class="mini" onclick="removeTournamentTeam('${x.id}','${tid}')">Delete</button></span>`).join('')||'<span class="status">No teams in this tournament.</span>'}
+async function openTournamentTeams(tid){
+  const box=$('#tTeams-'+tid); if(!box||!supabaseClient)return;
+  box.innerHTML='<span class="status">Loading teams...</span>';
+  const {data,error}=await supabaseClient.from('heo_tournament_teams').select('id,team_id,created_at,heo_teams(id,team_name,logo_url)').eq('tournament_id',tid).order('created_at',{ascending:true});
+  if(error){box.innerHTML='<span class="status">'+esc(error.message)+'</span>';return;}
+  const rows=data||[];
+  box.innerHTML=rows.length?rows.map(x=>`<span style="display:inline-flex;align-items:center;gap:6px;margin:3px 8px 3px 0">${x.heo_teams?.logo_url?`<img src="${escAttr(x.heo_teams.logo_url)}" style="width:26px;height:26px;object-fit:contain;border-radius:5px">`:''}<b>${esc(x.heo_teams?.team_name||'Team')}</b><button class="mini" onclick="removeTournamentTeam('${x.id}','${tid}')">Delete</button></span>`).join(''):'<span class="status">No teams in this tournament.</span>';
+}
 $('#tournamentForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!admin())return;const f=new FormData(e.target);const row={name:String(f.get('name')).trim(),round:String(f.get('round')||'').trim(),day:String(f.get('day')||'').trim(),week:String(f.get('week')||'').trim()};const {error}=await supabaseClient.from('heo_tournaments').insert(row);$('#tournamentMsg').textContent=error?error.message:'Tournament created.';if(!error){e.target.reset();await loadTournaments();await loadAllTeams();}});
 window.deleteTournament=async id=>{if(!admin())return;if(!confirm('Delete this tournament and its point entries/team links?'))return;try{const a=await supabaseClient.from('pt_entries').delete().eq('tournament_id',id);if(a.error)throw new Error(a.error.message);const b=await supabaseClient.from('heo_tournament_teams').delete().eq('tournament_id',id);if(b.error)throw new Error(b.error.message);const c=await supabaseClient.from('heo_tournaments').delete().eq('id',id);if(c.error)throw new Error(c.error.message);$('#tournamentMsg').textContent='Tournament deleted.';await loadTournaments();if($('#ptTournament'))$('#ptTournament').value='';$('#ptEditor').innerHTML='<div class="status">Select a tournament to load its point table.</div>'}catch(err){$('#tournamentMsg').textContent='Delete failed: '+err.message}};
 window.removeTournamentTeam=async(id,tid)=>{if(!admin())return;const {data:rel}=await supabaseClient.from('heo_tournament_teams').select('team_id').eq('id',id).maybeSingle();const {error}=await supabaseClient.from('heo_tournament_teams').delete().eq('id',id);if(error){$('#tournamentMsg').textContent=error.message;return}if(rel?.team_id)await supabaseClient.from('pt_entries').delete().eq('tournament_id',tid).eq('team_id',rel.team_id);await openTournamentTeams(tid);if($('#ptTournament').value===tid)await loadPointTable()};
@@ -383,7 +392,7 @@ async function renderPublicPointTable(){
 
 function unique(a){return [...new Set(a.filter(v=>v!==null&&v!==undefined&&v!==''))]}
 async function populateBannerTournaments(){await loadTournaments();const t=$('#bannerTournament');if(!t)return;if(!t.value&&tournamentCache[0])t.value=tournamentCache[0].id}
-function loadImage(src){return new Promise(resolve=>{if(!src)return resolve(null);const im=new Image();im.crossOrigin='anonymous';im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=src})}
+function loadImage(src){return new Promise(resolve=>{if(!src)return resolve(null);const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=src})}
 function fitBg(ctx,W,H){const opacity=Math.max(0,Math.min(100,Number($('#bannerBgOpacity')?.value??100)))/100;if(bgImg&&bgImg.complete&&bgImg.naturalWidth){const s=Math.min(W/bgImg.naturalWidth,H/bgImg.naturalHeight);const w=bgImg.naturalWidth*s,h=bgImg.naturalHeight*s;ctx.fillStyle='#030a12';ctx.fillRect(0,0,W,H);ctx.save();ctx.globalAlpha=opacity;ctx.drawImage(bgImg,(W-w)/2,(H-h)/2,w,h);ctx.restore()}else{const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#031522');g.addColorStop(.55,'#061b2b');g.addColorStop(1,'#02060d');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}}
 function cfg(){return {template:$('#bannerTemplate').value,size:$('#bannerSize').value,orgName:$('#bannerOrgName').value,orgColor:$('#bannerOrgColor').value,orgSize:+$('#bannerOrgSize').value,logoSize:+$('#bannerLogoSize').value,logoX:+$('#bannerLogoX').value,logoY:+$('#bannerLogoY').value,cellBg:$('#cellBg').value,cellBorder:$('#cellBorder').value,cellText:$('#cellText').value,bgOpacity:+$('#bannerBgOpacity').value,overlay:+$('#bannerOverlay').value}}
 
@@ -467,7 +476,7 @@ $('#publishBanner')?.addEventListener('click',async()=>{
 });
 $$('[data-admin-tab]').forEach(b=>b.onclick=async()=>{$$('.adminPanel').forEach(x=>x.style.display='none');const panel=$('#admin'+b.dataset.adminTab.charAt(0).toUpperCase()+b.dataset.adminTab.slice(1));if(panel)panel.style.display='block';if(b.dataset.adminTab==='users')await loadUsers();if(b.dataset.adminTab==='tournaments')await loadTournaments();if(b.dataset.adminTab==='points'){await loadTournaments();await loadAllTeams();await loadPointTable()}if(b.dataset.adminTab==='design'){await populateBannerTournaments();await loadSavedTemplates();if(!ptCache.length&&$('#bannerTournament').value)await loadPointTable();renderBanner()}if(b.dataset.adminTab==='reports')loadReports()});
 
-async function loadHighlight(){if(!supabaseClient)return;const {data,error}=await supabaseClient.from('home_highlights').select('*').eq('active',true).order('created_at',{ascending:false}).limit(1).maybeSingle();const box=$('#highlightContent');if(error||!data){box.innerHTML='<div class="emptyMedia">No highlight uploaded yet.</div>';return}const url=data.public_url;box.innerHTML=data.media_type==='video'?`<video class="highlightMedia" controls playsinline src="${escapeAttr(url)}"></video>`:`<img class="highlightMedia" src="${escapeAttr(url)}" alt="HEO Highlight">`;if(admin())$('#highlightAdminHint').textContent='Admin can replace this from Admin Panel.'}
+async function loadHighlight(){if(!supabaseClient)return;const {data,error}=await supabaseClient.from('home_highlights').select('*').eq('active',true).order('created_at',{ascending:false}).limit(1).maybeSingle();const box=$('#highlightContent');if(error){box.innerHTML='<div class="emptyMedia">Highlight load failed: '+escapeHtml(error.message)+'</div>';return}if(!data){box.innerHTML='<div class="emptyMedia">No highlight uploaded yet.</div>';return}const url=data.public_url;box.innerHTML=data.media_type==='video'?`<video class="highlightMedia" controls playsinline src="${escapeAttr(url)}"></video>`:`<img class="highlightMedia" src="${escapeAttr(url)}" alt="HEO Highlight">`;if(admin())$('#highlightAdminHint').textContent='Admin can replace this from Admin Panel.'}
 $('#uploadHighlight')?.addEventListener('click',async()=>{
   const f=$('#highlightFile').files[0];
   if(!f||!admin()){$('#highlightMsg').textContent='Select a media file and make sure you are an approved admin.';return}
