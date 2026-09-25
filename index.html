@@ -289,7 +289,7 @@ async function loadProfile(){
   if(admin()) $('#adminNav').style.display='block';
 }
 
-async function doAuth(){if(!authReady()){showStatus('Add your Supabase publishable key to the HTML first.');return}const email=$('#authEmail').value.trim(),password=$('#authPassword').value;if(!email||!password){showStatus('Enter email and password.');return}if(authMode==='login'){const {error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){showStatus(error.message);return}await loadProfile();closeAuth();if(currentProfile?.status==='disabled'){showStatus('This account is disabled.');await supabaseClient.auth.signOut();await loadProfile();openAuth('login');return}if(currentProfile?.status!=='approved'){originalSetPage('home');alert('Login successful, but your account is pending admin approval.')}else originalSetPage('home')}else{const {data,error}=await supabaseClient.auth.signUp({email,password});if(error){showStatus(error.message);return}showStatus(data.session?'Account created. Wait for approval.':'Account created. Check your email if confirmation is enabled, then wait for admin approval.');authMode='login';$('#authTitle').textContent='Login';$('#authSubmit').textContent='Login';$('#switchAuth').textContent='Create account';}}
+async function doAuth(){if(!authReady()){showStatus('Add your Supabase publishable key to the HTML first.');return}const email=$('#authEmail').value.trim(),password=$('#authPassword').value;if(!email||!password){showStatus('Enter email and password.');return}if(authMode==='login'){const {error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){showStatus(error.message);return}await refreshProfile();closeAuth();if(currentProfile?.status==='disabled'){showStatus('This account is disabled.');await supabaseClient.auth.signOut();await refreshProfile();openAuth('login');return}if(currentProfile?.status!=='approved'){originalSetPage('home');alert('Login successful, but your account is pending admin approval.')}else originalSetPage('home')}else{const {data,error}=await supabaseClient.auth.signUp({email,password});if(error){showStatus(error.message);return}showStatus(data.session?'Account created. Wait for approval.':'Account created. Check your email if confirmation is enabled, then wait for admin approval.');authMode='login';$('#authTitle').textContent='Login';$('#authSubmit').textContent='Login';$('#switchAuth').textContent='Create account';}}
 
 async function forgotPassword(){if(!authReady()){showStatus('Add your Supabase publishable key first.');return}const email=$('#authEmail').value.trim();if(!email){showStatus('Enter your email first.');return}const redirect=location.origin+location.pathname;const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:redirect});showStatus(error?error.message:'Password reset link sent if that email exists.')}
 
@@ -302,17 +302,33 @@ async function saveUser(id){if(!admin())return;const role=document.querySelector
 
 $('#loginBtn').onclick=()=>openAuth('login');$('#logoutBtn').onclick=doLogout;$('#closeAuth').onclick=closeAuth;$('#authSubmit').onclick=doAuth;$('#forgotBtn').onclick=forgotPassword;$('#switchAuth').onclick=()=>openAuth(authMode==='login'?'signup':'login');$('#userRows').addEventListener('click',e=>{const b=e.target.closest('[data-save]');if(b)saveUser(b.dataset.save)});$('#userSearch')?.addEventListener('input',e=>renderUsers(e.target.value));$('#userSearchClear')?.addEventListener('click',()=>{if($('#userSearch'))$('#userSearch').value='';renderUsers('')});
 
-if(supabaseClient){supabaseClient.auth.onAuthStateChange(()=>setTimeout(loadProfile,0));loadProfile()}
+let profileLoadPromise=null;
+async function refreshProfile(){if(profileLoadPromise)return profileLoadPromise;profileLoadPromise=loadProfile().finally(()=>{profileLoadPromise=null});return profileLoadPromise}
+if(supabaseClient){
+  supabaseClient.auth.onAuthStateChange((event)=>{
+    if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='TOKEN_REFRESHED'){
+      setTimeout(()=>refreshProfile(),0);
+    }
+  });
+}
 
 
 
+
+refreshProfile().catch(err=>showStatus('Session restore failed: '+(err?.message||err)));
 
 // ===== HEO OFFICIAL PLATFORM EXTENSION =====
 const ORG_SECTIONS={pointTable:'Point Table',announcements:'Announcements',news:'HEO News',teams:'Teams',tournaments:'Tournaments',rankings:'Rankings',events:'Events',results:'Results'};
 let ptCache=[],teamCache=[],tournamentCache=[],tournamentTeamCache=[],bgImg=null;
 const oldSetPage2=originalSetPage;
-function esc(v){return escapeHtml(v)}
-function escAttr(v){return escapeHtml(v)}
+function escapeHtml(v){
+  return String(v ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+function escapeAttr(v){ return escapeHtml(v); }
+function esc(v){ return escapeHtml(v); }
+
 function sortRows(rows){return [...rows].sort((a,b)=>(Number(b.tp)||0)-(Number(a.tp)||0)||(Number(b.win)||0)-(Number(a.win)||0)||(Number(b.kp)||0)-(Number(a.kp)||0))}
 function currentAccess(){return {academic:approved(),zone:approved(),rotation:approved(),pointTable:true,tournaments:true,designStudio:admin()}}
 function featureAllowed(feature){if(feature==='academic'||feature==='zone'||feature==='rotation')return approved();if(feature==='designStudio')return admin();return true}
@@ -370,7 +386,7 @@ $('#ptTournament')?.addEventListener('change',async()=>{await loadPointTable();a
 
 async function renderPublicTournaments(){
   const box=$('#orgContent');
-  box.innerHTML='<h3>🏆 Tournaments</h3><div class="searchRow"><input id="publicTournamentSearch" type="search" placeholder="Search tournament by name..."><button id="publicTournamentClear" type="button">Clear</button></div><div id="publicTournamentList" class="contentPanel">Loading...</div>';
+  box.innerHTML='<h3>🏆 Tournaments</h3><div class="searchRow"><input id="publicTournamentSearch" type="search" placeholder="Search tournament by name..."><button id="publicTournamentClear" type="button">Clear</button></div><div id="publicTournamentList" class="contentPanel">Loading tournaments...</div>';
   if(!supabaseClient){$('#publicTournamentList').innerHTML='<div class="status">Supabase is not configured.</div>';return}
   const {data,error}=await supabaseClient.from('heo_tournaments').select('id,name,round,day,week,created_at').order('created_at',{ascending:false});
   if(error){$('#publicTournamentList').innerHTML='<div class="status">'+esc(error.message)+'</div>';return}
@@ -391,7 +407,18 @@ async function renderPublicPointTable(){
 }
 
 function unique(a){return [...new Set(a.filter(v=>v!==null&&v!==undefined&&v!==''))]}
-async function populateBannerTournaments(){await loadTournaments();const t=$('#bannerTournament');if(!t)return;if(!t.value&&tournamentCache[0])t.value=tournamentCache[0].id}
+async function populateBannerTournaments(){
+  const t=$('#bannerTournament');
+  if(!t)return;
+  if(!admin()){t.innerHTML='<option value="">Admin approval required</option>';return;}
+  if(!tournamentCache.length) await loadTournaments();
+  if(!tournamentCache.length){
+    t.innerHTML='<option value="">No tournaments available</option>';
+    return;
+  }
+  t.innerHTML=tournamentCache.map(x=>`<option value="${escAttr(x.id)}">${esc(x.name)}</option>`).join('');
+  if(!t.value) t.value=tournamentCache[0].id;
+}
 function loadImage(src){return new Promise(resolve=>{if(!src)return resolve(null);const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=src})}
 function fitBg(ctx,W,H){const opacity=Math.max(0,Math.min(100,Number($('#bannerBgOpacity')?.value??100)))/100;if(bgImg&&bgImg.complete&&bgImg.naturalWidth){const s=Math.min(W/bgImg.naturalWidth,H/bgImg.naturalHeight);const w=bgImg.naturalWidth*s,h=bgImg.naturalHeight*s;ctx.fillStyle='#030a12';ctx.fillRect(0,0,W,H);ctx.save();ctx.globalAlpha=opacity;ctx.drawImage(bgImg,(W-w)/2,(H-h)/2,w,h);ctx.restore()}else{const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#031522');g.addColorStop(.55,'#061b2b');g.addColorStop(1,'#02060d');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}}
 function cfg(){return {template:$('#bannerTemplate').value,size:$('#bannerSize').value,orgName:$('#bannerOrgName').value,orgColor:$('#bannerOrgColor').value,orgSize:+$('#bannerOrgSize').value,logoSize:+$('#bannerLogoSize').value,logoX:+$('#bannerLogoX').value,logoY:+$('#bannerLogoY').value,cellBg:$('#cellBg').value,cellBorder:$('#cellBorder').value,cellText:$('#cellText').value,bgOpacity:+$('#bannerBgOpacity').value,overlay:+$('#bannerOverlay').value}}
@@ -456,7 +483,20 @@ $('#deleteTemplate')?.addEventListener('click',async()=>{
   if(t?.background_path)await supabaseClient.storage.from('heo-design-assets').remove([t.background_path]);
   $('#savedTemplate').value='';$('#templateName').value='';$('#bannerBgStatus').textContent='Template deleted.';await loadSavedTemplates();
 });
-async function renderBanner(){const c=$('#bannerCanvas');if(!c)return;const [W,H]=$('#bannerSize').value.split('x').map(Number);c.width=W;c.height=H;const ctx=c.getContext('2d');const C=cfg();fitBg(ctx,W,H);ctx.fillStyle=`rgba(0,5,12,${C.overlay/100})`;ctx.fillRect(0,0,W,H);const t=tournamentById($('#bannerTournament').value);if(t){await loadPointTableForDesign(t.id)}let rows=sortRows(ptCache.filter(x=>x.tournament_id===t?.id));const logo=await loadImage('assets/heo-logo.jpg');const logoSize=Math.min(C.logoSize,W*.16);const lx=W*(C.logoX/100)-logoSize/2,ly=H*(C.logoY/100);if(logo)ctx.drawImage(logo,lx,ly,logoSize,logoSize);ctx.textAlign='center';ctx.fillStyle=C.orgColor;ctx.font=`900 ${C.orgSize}px Arial`;const orgY=ly+logoSize+Math.max(16,H*.018);ctx.fillText(C.orgName,W/2,orgY);const metaY=orgY+Math.max(22,H*.04);ctx.strokeStyle=C.cellBorder;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(W*.10,metaY-18);ctx.lineTo(W*.90,metaY-18);ctx.moveTo(W*.10,metaY+18);ctx.lineTo(W*.90,metaY+18);ctx.stroke();ctx.fillStyle=C.cellText;ctx.font=`900 ${Math.max(13,W*.016)}px Arial`;ctx.fillText(`TOURNAMENT  ${t?.name||'—'}   |   ROUND  ${t?.round||'—'}   |   DAY  ${t?.day||'—'}   |   WEEK  ${t?.week||'—'}`,W/2,metaY+6);const tableY=metaY+H*.045;const margin=W*.045,tableW=W-margin*2;const cols=[.08,.08,.27,.095,.095,.095,.095,.095],widths=cols.map(v=>tableW*v),headers=['RANK','','TEAM','MP','WIN','PP','KP','TP'];const th=Math.max(38,H*.045),rowH=Math.max(46,H*.052);let x=margin;ctx.font=`900 ${Math.max(12,W*.015)}px Arial`;headers.forEach((h,i)=>{ctx.fillStyle=C.cellBg;ctx.fillRect(x,tableY,widths[i],th);ctx.strokeStyle=C.cellBorder;ctx.strokeRect(x,tableY,widths[i],th);if(h){ctx.fillStyle='#8fe2ff';ctx.fillText(h,x+widths[i]/2,tableY+th*.62)}x+=widths[i]});const imgs=await Promise.all(rows.slice(0,14).map(r=>loadImage(r.logo_url)));rows.slice(0,14).forEach((r,i)=>{const y=tableY+th+i*rowH;x=margin;for(let j=0;j<headers.length;j++){ctx.fillStyle=i%2?C.cellBg:'#09243a';ctx.fillRect(x,y,widths[j],rowH);ctx.strokeStyle=C.cellBorder;ctx.strokeRect(x,y,widths[j],rowH);x+=widths[j]}ctx.fillStyle=C.cellText;ctx.font=`900 ${Math.max(13,W*.017)}px Arial`;ctx.fillText(String(i+1).padStart(2,'0'),margin+widths[0]/2,y+rowH*.63);if(imgs[i]){const ss=Math.min(rowH-10,widths[1]-10);ctx.drawImage(imgs[i],margin+widths[0]+(widths[1]-ss)/2,y+(rowH-ss)/2,ss,ss)}const vals=[r.team_name,r.mp||0,r.win||0,r.pp||0,r.kp||0,r.tp||0];let xx=margin+widths[0]+widths[1];vals.forEach((v,j)=>{ctx.fillStyle=j===5?'#ffd21a':C.cellText;ctx.font=`${j===0?'900':'800'} ${Math.max(13,W*.016)}px Arial`;ctx.fillText(String(v).slice(0,j===0?18:8),xx+widths[j+2]/2,y+rowH*.63);xx+=widths[j+2]})});if(C.template==='classic'){ctx.strokeStyle=C.cellBorder;ctx.lineWidth=Math.max(3,W*.004);ctx.strokeRect(W*.025,H*.02,W*.95,H*.955);ctx.fillStyle=C.cellBorder;ctx.fillRect(W*.025,H*.02,W*.22,7);ctx.fillRect(W*.755,H*.02,W*.22,7)}else if(C.template==='sharp'){ctx.strokeStyle=C.cellBorder;ctx.lineWidth=Math.max(4,W*.006);ctx.beginPath();ctx.moveTo(W*.025,H*.025);ctx.lineTo(W*.18,H*.025);ctx.lineTo(W*.12,H*.075);ctx.moveTo(W*.975,H*.025);ctx.lineTo(W*.82,H*.025);ctx.lineTo(W*.88,H*.075);ctx.stroke()}else{ctx.strokeStyle=C.cellBorder;ctx.lineWidth=2;ctx.strokeRect(W*.055,H*.03,W*.89,H*.92)}ctx.textAlign='left'}
+async function renderBanner(){
+  const c=$('#bannerCanvas');if(!c)return;
+  const [W,H]=$('#bannerSize').value.split('x').map(Number);
+  c.width=W;c.height=H;
+  const ctx=c.getContext('2d');const C=cfg();fitBg(ctx,W,H);
+  ctx.fillStyle=`rgba(0,5,12,${C.overlay/100})`;ctx.fillRect(0,0,W,H);
+  const t=tournamentById($('#bannerTournament').value);
+  if(!t){
+    ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.font='700 28px Arial';
+    ctx.fillText('Select a tournament first',W/2,H/2);
+    ptCache=[];return;
+  }
+  await loadPointTableForDesign(t.id);
+  let rows=sortRows(ptCache.filter(x=>x.tournament_id===t.id));const logo=await loadImage('assets/heo-logo.jpg');const logoSize=Math.min(C.logoSize,W*.16);const lx=W*(C.logoX/100)-logoSize/2,ly=H*(C.logoY/100);if(logo)ctx.drawImage(logo,lx,ly,logoSize,logoSize);ctx.textAlign='center';ctx.fillStyle=C.orgColor;ctx.font=`900 ${C.orgSize}px Arial`;const orgY=ly+logoSize+Math.max(16,H*.018);ctx.fillText(C.orgName,W/2,orgY);const metaY=orgY+Math.max(22,H*.04);ctx.strokeStyle=C.cellBorder;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(W*.10,metaY-18);ctx.lineTo(W*.90,metaY-18);ctx.moveTo(W*.10,metaY+18);ctx.lineTo(W*.90,metaY+18);ctx.stroke();ctx.fillStyle=C.cellText;ctx.font=`900 ${Math.max(13,W*.016)}px Arial`;ctx.fillText(`TOURNAMENT  ${t?.name||'—'}   |   ROUND  ${t?.round||'—'}   |   DAY  ${t?.day||'—'}   |   WEEK  ${t?.week||'—'}`,W/2,metaY+6);const tableY=metaY+H*.045;const margin=W*.045,tableW=W-margin*2;const cols=[.08,.08,.27,.095,.095,.095,.095,.095],widths=cols.map(v=>tableW*v),headers=['RANK','','TEAM','MP','WIN','PP','KP','TP'];const th=Math.max(38,H*.045),rowH=Math.max(46,H*.052);let x=margin;ctx.font=`900 ${Math.max(12,W*.015)}px Arial`;headers.forEach((h,i)=>{ctx.fillStyle=C.cellBg;ctx.fillRect(x,tableY,widths[i],th);ctx.strokeStyle=C.cellBorder;ctx.strokeRect(x,tableY,widths[i],th);if(h){ctx.fillStyle='#8fe2ff';ctx.fillText(h,x+widths[i]/2,tableY+th*.62)}x+=widths[i]});const imgs=await Promise.all(rows.slice(0,14).map(r=>loadImage(r.logo_url)));rows.slice(0,14).forEach((r,i)=>{const y=tableY+th+i*rowH;x=margin;for(let j=0;j<headers.length;j++){ctx.fillStyle=i%2?C.cellBg:'#09243a';ctx.fillRect(x,y,widths[j],rowH);ctx.strokeStyle=C.cellBorder;ctx.strokeRect(x,y,widths[j],rowH);x+=widths[j]}ctx.fillStyle=C.cellText;ctx.font=`900 ${Math.max(13,W*.017)}px Arial`;ctx.fillText(String(i+1).padStart(2,'0'),margin+widths[0]/2,y+rowH*.63);if(imgs[i]){const ss=Math.min(rowH-10,widths[1]-10);ctx.drawImage(imgs[i],margin+widths[0]+(widths[1]-ss)/2,y+(rowH-ss)/2,ss,ss)}const vals=[r.team_name,r.mp||0,r.win||0,r.pp||0,r.kp||0,r.tp||0];let xx=margin+widths[0]+widths[1];vals.forEach((v,j)=>{ctx.fillStyle=j===5?'#ffd21a':C.cellText;ctx.font=`${j===0?'900':'800'} ${Math.max(13,W*.016)}px Arial`;ctx.fillText(String(v).slice(0,j===0?18:8),xx+widths[j+2]/2,y+rowH*.63);xx+=widths[j+2]})});if(C.template==='classic'){ctx.strokeStyle=C.cellBorder;ctx.lineWidth=Math.max(3,W*.004);ctx.strokeRect(W*.025,H*.02,W*.95,H*.955);ctx.fillStyle=C.cellBorder;ctx.fillRect(W*.025,H*.02,W*.22,7);ctx.fillRect(W*.755,H*.02,W*.22,7)}else if(C.template==='sharp'){ctx.strokeStyle=C.cellBorder;ctx.lineWidth=Math.max(4,W*.006);ctx.beginPath();ctx.moveTo(W*.025,H*.025);ctx.lineTo(W*.18,H*.025);ctx.lineTo(W*.12,H*.075);ctx.moveTo(W*.975,H*.025);ctx.lineTo(W*.82,H*.025);ctx.lineTo(W*.88,H*.075);ctx.stroke()}else{ctx.strokeStyle=C.cellBorder;ctx.lineWidth=2;ctx.strokeRect(W*.055,H*.03,W*.89,H*.92)}ctx.textAlign='left'}
 async function loadPointTableForDesign(tid){if(!supabaseClient||!tid)return;const rel=await supabaseClient.from('heo_tournament_teams').select('team_id, heo_teams(id,team_name,logo_url)').eq('tournament_id',tid).order('created_at');if(rel.error){$('#bannerBgStatus').textContent='Design data error: '+rel.error.message;ptCache=[];return}const q=await supabaseClient.from('pt_entries').select('*').eq('tournament_id',tid);if(q.error){$('#bannerBgStatus').textContent='Point data error: '+q.error.message;ptCache=[];return}const entries=q.data||[];ptCache=(rel.data||[]).map(x=>{const team=x.heo_teams;return entries.find(e=>e.team_id===team.id)||{tournament_id:tid,team_id:team.id,team_name:team.team_name,logo_url:team.logo_url,mp:0,win:0,pp:0,kp:0,tp:0}})}
 $('#bannerBg')?.addEventListener('change',e=>{const f=e.target.files[0];if(f){bgImg=new Image();bgImg.onload=renderBanner;bgImg.src=URL.createObjectURL(f)}});['bannerSize','bannerTemplate','bannerTournament','bannerOrgName','bannerOrgColor','bannerOrgSize','bannerLogoSize','bannerLogoX','bannerLogoY','cellBg','cellBorder','cellText','bannerBgOpacity','bannerOverlay'].forEach(id=>$('#'+id)?.addEventListener('input',renderBanner));
 $('#renderBanner')?.addEventListener('click',renderBanner);
@@ -504,5 +544,21 @@ $('#deleteHighlight')?.addEventListener('click',async()=>{if(!admin())return;con
 async function loadReports(){if(!admin()||!supabaseClient)return;const {data,error}=await supabaseClient.from('problem_reports').select('*').order('created_at',{ascending:false});if(error){$('#reportsTable').textContent=error.message;return}$('#reportsTable').innerHTML=(data||[]).map(r=>`<div style="padding:10px;border-bottom:1px solid #17394b"><b>${escapeHtml(r.subject||'Untitled')}</b> — ${escapeHtml(r.type||'Other')}<br><small>${escapeHtml(r.page||'')} • ${new Date(r.created_at).toLocaleString()}</small><p>${escapeHtml(r.message||'')}</p><select onchange="updateReport('${r.id}',this.value)"><option ${r.status==='Open'?'selected':''}>Open</option><option ${r.status==='Reviewing'?'selected':''}>Reviewing</option><option ${r.status==='Resolved'?'selected':''}>Resolved</option></select></div>`).join('')||'<div class="status">No reports.</div>'}
 window.updateReport=async(id,status)=>{if(!admin())return;await supabaseClient.from('problem_reports').update({status}).eq('id',id);loadReports()};
 $('#reportOpen').onclick=()=>$('#reportModal').classList.add('open');$('#reportClose').onclick=()=>$('#reportModal').classList.remove('open');$('#reportSubmit').onclick=async()=>{if(!supabaseClient){$('#reportMsg').textContent='Supabase not configured.';return}const {error}=await supabaseClient.from('problem_reports').insert({reporter_email:currentUser?.email||null,page:location.hash||location.pathname,type:$('#reportType').value,subject:$('#reportSubject').value.trim(),message:$('#reportMessage').value.trim(),status:'Open'});$('#reportMsg').textContent=error?error.message:'Report submitted.';if(!error){$('#reportSubject').value='';$('#reportMessage').value=''}};
-loadHighlight();loadProfile().then(()=>{if(admin())$('#adminNav').style.display='block';$('#adminTools').style.display='none';document.querySelector('#academicGate').style.display=approved()?'none':'block';document.querySelector('#academicContent').style.display=approved()?'block':'none';applyUserHubAccess()});
+(async()=>{
+  await refreshProfile();
+  await loadHighlight();
+  if(admin()){
+    $('#adminNav').style.display='block';
+    $('#adminTools').style.display='block';
+    await loadTournaments();
+    await loadUsers();
+    await loadReports();
+  }else{
+    $('#adminNav').style.display='none';
+    $('#adminTools').style.display='none';
+  }
+  document.querySelector('#academicGate').style.display=approved()?'none':'block';
+  document.querySelector('#academicContent').style.display=approved()?'block':'none';
+  applyUserHubAccess();
+})();
 </script></body></html>
