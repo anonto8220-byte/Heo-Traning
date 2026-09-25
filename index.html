@@ -282,7 +282,18 @@ async function doLogout(){if(supabaseClient)await supabaseClient.auth.signOut();
 let userCache=[];
 const DEFAULT_ACCESS={academic:true,zone:true,rotation:true,pointTable:true,tournaments:true,designStudio:true};
 function normalizeAccess(a,role,status){const x={...DEFAULT_ACCESS,...(a&&typeof a==='object'?a:{})};if(status!=='approved'){for(const k of Object.keys(x))x[k]=false}else if(role==='admin'){for(const k of Object.keys(x))x[k]=true}return x}
-async function loadUsers(){if(!admin()||!supabaseClient)return;const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at,access').order('created_at',{ascending:false});const body=$('#userRows');if(error){body.innerHTML='';$('#adminMsg').textContent=error.message;return}userCache=data||[];renderUsers($('#userSearch')?.value||'')}
+async function loadUsers(){
+  if(!admin()||!supabaseClient)return;
+  const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at,access').order('created_at',{ascending:false});
+  const body=$('#userRows');
+  if(error){
+    if(body)body.innerHTML='<tr><td colspan="6" class="status">'+esc(error.message)+'</td></tr>';
+    $('#adminMsg').textContent='User load failed: '+error.message;
+    return;
+  }
+  userCache=Array.isArray(data)?data:[];
+  renderUsers($('#userSearch')?.value||'');
+}
 function renderUsers(q=''){const body=$('#userRows');if(!body)return;const needle=String(q).trim().toLowerCase();const data=userCache.filter(u=>!needle||String(u.email||'').toLowerCase().includes(needle));body.innerHTML='';for(const u of data){const a=normalizeAccess(u.access,u.role,u.status);const accessKeys=[['academic','Academic'],['zone','Zone'],['rotation','Rotation'],['pointTable','Point Table'],['tournaments','Tournaments'],['designStudio','Design Studio']];const accessHtml=accessKeys.map(([k,label])=>`<label style="display:inline-flex;align-items:center;gap:4px;margin:2px 5px 2px 0;font-size:10px"><input type="checkbox" data-id="${u.id}" data-access="${k}" ${a[k]?'checked':''} ${u.role==='admin'?'disabled':''}>${label}</label>`).join('');const tr=document.createElement('tr');tr.innerHTML=`<td>${escapeHtml(u.email||'')}</td><td>${escapeHtml(u.display_name||'')}</td><td><select data-id="${u.id}" data-field="role"><option value="user" ${u.role==='user'?'selected':''}>user</option><option value="admin" ${u.role==='admin'?'selected':''}>admin</option></select></td><td><select data-id="${u.id}" data-field="status"><option value="pending" ${u.status==='pending'?'selected':''}>pending</option><option value="approved" ${u.status==='approved'?'selected':''}>approved</option><option value="disabled" ${u.status==='disabled'?'selected':''}>disabled</option></select></td><td style="min-width:230px">${accessHtml}</td><td><button data-save="${u.id}">Save</button></td>`;body.appendChild(tr)}$('#adminMsg').textContent=`Showing ${data.length} of ${userCache.length} account(s).`}
 async function saveUser(id){if(!admin())return;const role=document.querySelector(`select[data-id="${id}"][data-field="role"]`).value,status=document.querySelector(`select[data-id="${id}"][data-field="status"]`).value;const access={};document.querySelectorAll(`input[data-id="${id}"][data-access]`).forEach(i=>access[i.dataset.access]=i.checked);if(role==='admin')Object.keys(DEFAULT_ACCESS).forEach(k=>access[k]=true);if(status!=='approved'&&role!=='admin')Object.keys(access).forEach(k=>access[k]=false);const {error}=await supabaseClient.from('profiles').update({role,status,access}).eq('id',id);if(error)$('#adminMsg').textContent=error.message;else{await loadUsers();$('#adminMsg').textContent='User updated.'}}
 
@@ -297,7 +308,13 @@ if(supabaseClient){supabaseClient.auth.onAuthStateChange(()=>setTimeout(loadProf
 const ORG_SECTIONS={pointTable:'Point Table',announcements:'Announcements',news:'HEO News',teams:'Teams',tournaments:'Tournaments',rankings:'Rankings',events:'Events',results:'Results'};
 let ptCache=[],teamCache=[],tournamentCache=[],tournamentTeamCache=[],bgImg=null;
 const oldSetPage2=originalSetPage;
-function esc(v){return escapeHtml(v)}
+function escapeHtml(v){
+  return String(v ?? '').replace(/[&<>"']/g, function(ch){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];
+  });
+}
+function escapeAttr(v){ return escapeHtml(v); }
+function esc(v){ return escapeHtml(v); }
 function sortRows(rows){return [...rows].sort((a,b)=>(Number(b.tp)||0)-(Number(a.tp)||0)||(Number(b.win)||0)-(Number(a.win)||0)||(Number(b.kp)||0)-(Number(a.kp)||0))}
 function currentAccess(){return normalizeAccess(currentProfile?.access,currentProfile?.role,currentProfile?.status)}
 function featureAllowed(feature){if(admin())return true;return !!currentAccess()[feature]}
@@ -318,7 +335,20 @@ $('#academicLogin')?.addEventListener('click',()=>openAuth('login'));
 $$('[data-org]').forEach(b=>b.onclick=async()=>{const key=b.dataset.org;if(key==='pointTable')await renderPublicPointTable();else $('#orgContent').innerHTML='<h3>'+esc(ORG_SECTIONS[key])+'</h3><p class="status">This public section is ready for future HEO content.</p>'});
 
 async function getPointRows(){if(!supabaseClient)return [];const {data,error}=await supabaseClient.from('pt_entries').select('*').order('created_at',{ascending:false});if(error){console.error(error);return []}return data||[]}
-async function loadTournaments(){if(!admin()||!supabaseClient)return;const {data,error}=await supabaseClient.from('heo_tournaments').select('*').order('created_at',{ascending:false});if(error){$('#tournamentList').innerHTML='<div class="status">'+esc(error.message)+'</div>';return}tournamentCache=data||[];renderTournamentList();fillTournamentSelects();}
+async function loadTournaments(){
+  if(!admin()||!supabaseClient)return;
+  const box=$('#tournamentList');
+  const {data,error}=await supabaseClient.from('heo_tournaments').select('*').order('created_at',{ascending:false});
+  if(error){
+    tournamentCache=[];
+    if(box)box.innerHTML='<div class="status">Tournament load failed: '+esc(error.message)+'</div>';
+    fillTournamentSelects();
+    return;
+  }
+  tournamentCache=Array.isArray(data)?data:[];
+  renderTournamentList();
+  fillTournamentSelects();
+}
 function fillTournamentSelects(){const els=[$('#ptTournament'),$('#bannerTournament')];els.forEach(sel=>{if(!sel)return;const old=sel.value;sel.innerHTML='<option value="">Select tournament</option>'+tournamentCache.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');if(tournamentCache.some(t=>t.id===old))sel.value=old})}
 function tournamentById(id){return tournamentCache.find(t=>t.id===id)}
 function renderTournamentList(){const box=$('#tournamentList');if(!box)return;if(!tournamentCache.length){box.innerHTML='<div class="status">No tournaments yet.</div>';return}box.innerHTML=tournamentCache.map(t=>`<div class="tournamentRow"><b>${esc(t.name)}</b><div class="status">Round ${esc(t.round||'—')} • Day ${esc(t.day||'—')} • Week ${esc(t.week||'—')}</div><div id="tTeams-${t.id}" class="teamEntryRow">Loading teams...</div><div style="margin-top:8px"><button class="mini" onclick="openTeamModal('${t.id}')">+ Add Team</button> <button class="mini" onclick="openTournamentTeams('${t.id}')">Refresh Teams</button> <button class="mini" onclick="deleteTournament('${t.id}')">Delete Tournament</button></div></div>`).join('');tournamentCache.forEach(t=>openTournamentTeams(t.id));}
@@ -412,7 +442,9 @@ $('#bannerBg')?.addEventListener('change',e=>{const f=e.target.files[0];if(f){bg
 $('#renderBanner')?.addEventListener('click',renderBanner);$('#downloadBannerPng')?.addEventListener('click',()=>{const a=document.createElement('a');a.download='HEO-Point-Table.png';a.href=$('#bannerCanvas').toDataURL('image/png');a.click()});$('#downloadBannerJpg')?.addEventListener('click',()=>{const a=document.createElement('a');a.download='HEO-Point-Table.jpg';a.href=$('#bannerCanvas').toDataURL('image/jpeg',.95);a.click()});
 $$('[data-admin-tab]').forEach(b=>b.onclick=async()=>{$$('.adminPanel').forEach(x=>x.style.display='none');const panel=$('#admin'+b.dataset.adminTab.charAt(0).toUpperCase()+b.dataset.adminTab.slice(1));if(panel)panel.style.display='block';if(b.dataset.adminTab==='users')await loadUsers();if(b.dataset.adminTab==='tournaments')await loadTournaments();if(b.dataset.adminTab==='points'){await loadTournaments();await loadAllTeams();await loadPointTable()}if(b.dataset.adminTab==='design'){await populateBannerTournaments();await loadSavedTemplates();if(!ptCache.length&&$('#bannerTournament').value)await loadPointTable();renderBanner()}if(b.dataset.adminTab==='reports')loadReports()});
 
-async function loadHighlight(){if(!supabaseClient)return;const {data,error}=await supabaseClient.from('home_highlights').select('*').eq('active',true).order('created_at',{ascending:false}).limit(1).maybeSingle();const box=$('#highlightContent');if(error||!data){box.innerHTML='<div class="emptyMedia">No highlight uploaded yet.</div>';return}const url=data.public_url;box.innerHTML=data.media_type==='video'?`<video class="highlightMedia" controls playsinline src="${escapeAttr(url)}"></video>`:`<img class="highlightMedia" src="${escapeAttr(url)}" alt="HEO Highlight">`;if(admin())$('#highlightAdminHint').textContent='Admin can replace this from Admin Panel.'}
+async function loadHighlight(){if(!supabaseClient)return;const {data,error}=await supabaseClient.from('home_highlights').select('*').eq('active',true).order('created_at',{ascending:false}).limit(1).maybeSingle();const box=$('#highlightContent');if(error||!data){box.innerHTML='<div class="emptyMedia">No highlight uploaded yet.</div>';return}const url=String(data.public_url||'').trim();
+if(!url){box.innerHTML='<div class="emptyMedia">Highlight file URL is missing.</div>';return}
+box.innerHTML=data.media_type==='video'?`<video class="highlightMedia" controls playsinline src="${escapeAttr(url)}"></video>`:`<img class="highlightMedia" src="${escapeAttr(url)}" alt="HEO highlight">`;if(admin())$('#highlightAdminHint').textContent='Admin can replace this from Admin Panel.'}
 $('#uploadHighlight')?.addEventListener('click',async()=>{
   const f=$('#highlightFile').files[0];
   if(!f||!admin()){$('#highlightMsg').textContent='Select a media file and make sure you are an approved admin.';return}
