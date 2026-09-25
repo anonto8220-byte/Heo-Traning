@@ -190,7 +190,7 @@ function resizeCanvas(){
 }
 function cp(e){const r=canvas.getBoundingClientRect(),z=state.rot.zoom||1;return{x:(e.clientX-r.left)/z,y:(e.clientY-r.top)/z}}
 function saveSnap(){history.push(canvas.toDataURL());if(history.length>50)history.shift();future=[]}
-function restore(src){ctx.clearRect(0,0,state.rot.w||canvas.clientWidth,state.rot.h||canvas.clientHeight);if(!src)return;const im=new Image();im.onload=()=>ctx.drawImage(im,0,0,state.rot.w||canvas.clientWidth,state.rot.h||canvas.clientHeight);im.src=src}
+function restore(src){ctx.clearRect(0,0,state.rot.w||canvas.clientWidth,state.rot.h||canvas.clientHeight);if(!src)return;const im=new Image();im.crossOrigin='anonymous';im.onload=()=>ctx.drawImage(im,0,0,state.rot.w||canvas.clientWidth,state.rot.h||canvas.clientHeight);im.src=src}
 function clearDrawing(){ctx.clearRect(0,0,state.rot.w||canvas.clientWidth,state.rot.h||canvas.clientHeight);history=[];future=[];drawMode=null;canvas.style.pointerEvents='none';updateToolUI();$('#rStatus').textContent='Drawing cleared.'}
 function updateToolUI(){
   ['free','arrow','route','circle','box','eraser'].forEach(id=>$('#'+id)?.classList.toggle('active',drawMode===({free:'free',arrow:'arrow',route:'line',circle:'circle',box:'box',eraser:'eraser'}[id])));
@@ -271,7 +271,7 @@ async function secureSetPage(p){if(p==='admin'&&!admin()){openAuth('login');retu
 
 function showStatus(msg){$('#authMsg').textContent=msg}
 
-async function loadProfile(){if(!supabaseClient)return;const {data:{user}}=await supabaseClient.auth.getUser();currentUser=user||null;currentProfile=null;if(user){const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at,access').eq('id',user.id).maybeSingle();if(!error)currentProfile=data}updateAuthUI();}
+async function loadProfile(){if(!supabaseClient)return;const {data:{user}}=await supabaseClient.auth.getUser();currentUser=user||null;currentProfile=null;if(user){const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at').eq('id',user.id).maybeSingle();if(!error)currentProfile=data}updateAuthUI();}
 
 async function doAuth(){if(!authReady()){showStatus('Add your Supabase publishable key to the HTML first.');return}const email=$('#authEmail').value.trim(),password=$('#authPassword').value;if(!email||!password){showStatus('Enter email and password.');return}if(authMode==='login'){const {error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){showStatus(error.message);return}await loadProfile();closeAuth();if(currentProfile?.status==='disabled'){showStatus('This account is disabled.');await supabaseClient.auth.signOut();await loadProfile();openAuth('login');return}if(currentProfile?.status!=='approved'){originalSetPage('home');alert('Login successful, but your account is pending admin approval.')}else originalSetPage('home')}else{const {data,error}=await supabaseClient.auth.signUp({email,password});if(error){showStatus(error.message);return}showStatus(data.session?'Account created. Wait for approval.':'Account created. Check your email if confirmation is enabled, then wait for admin approval.');authMode='login';$('#authTitle').textContent='Login';$('#authSubmit').textContent='Login';$('#switchAuth').textContent='Create account';}}
 
@@ -280,11 +280,32 @@ async function forgotPassword(){if(!authReady()){showStatus('Add your Supabase p
 async function doLogout(){if(supabaseClient)await supabaseClient.auth.signOut();currentUser=null;currentProfile=null;updateAuthUI();if($('#adminNav'))$('#adminNav').style.display='none';if($('#adminTools'))$('#adminTools').style.display='none';originalSetPage('home')}
 
 let userCache=[];
-const DEFAULT_ACCESS={academic:true,zone:true,rotation:true,pointTable:true,tournaments:true,designStudio:true};
-function normalizeAccess(a,role,status){const x={...DEFAULT_ACCESS,...(a&&typeof a==='object'?a:{})};if(status!=='approved'){for(const k of Object.keys(x))x[k]=false}else if(role==='admin'){for(const k of Object.keys(x))x[k]=true}return x}
-async function loadUsers(){if(!admin()||!supabaseClient)return;const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at,access').order('created_at',{ascending:false});const body=$('#userRows');if(error){body.innerHTML='';$('#adminMsg').textContent=error.message;return}userCache=data||[];renderUsers($('#userSearch')?.value||'')}
-function renderUsers(q=''){const body=$('#userRows');if(!body)return;const needle=String(q).trim().toLowerCase();const data=userCache.filter(u=>!needle||String(u.email||'').toLowerCase().includes(needle));body.innerHTML='';for(const u of data){const tr=document.createElement('tr');tr.innerHTML=`<td>${escapeHtml(u.email||'')}</td><td>${escapeHtml(u.display_name||'')}</td><td><select data-id="${u.id}" data-field="role"><option value="user" ${u.role==='user'?'selected':''}>user</option><option value="admin" ${u.role==='admin'?'selected':''}>admin</option></select></td><td><select data-id="${u.id}" data-field="status"><option value="pending" ${u.status==='pending'?'selected':''}>pending</option><option value="approved" ${u.status==='approved'?'selected':''}>approved</option><option value="disabled" ${u.status==='disabled'?'selected':''}>disabled</option></select></td><td><button data-save="${u.id}">Save</button></td>`;body.appendChild(tr)}$('#adminMsg').textContent=`Showing ${data.length} of ${userCache.length} account(s).`}
-async function saveUser(id){if(!admin())return;const role=document.querySelector(`select[data-id="${id}"][data-field="role"]`).value,status=document.querySelector(`select[data-id="${id}"][data-field="status"]`).value;const {error}=await supabaseClient.from('profiles').update({role,status}).eq('id',id);if(error)$('#adminMsg').textContent=error.message;else{await loadUsers();$('#adminMsg').textContent='User updated.'}}
+async function loadUsers(){
+  if(!admin()||!supabaseClient)return;
+  const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at').order('created_at',{ascending:false});
+  const body=$('#userRows');
+  if(error){body.innerHTML='';$('#adminMsg').textContent='User load failed: '+error.message;return}
+  userCache=data||[];renderUsers($('#userSearch')?.value||'');
+}
+function renderUsers(q=''){
+  const body=$('#userRows');if(!body)return;
+  const needle=String(q).trim().toLowerCase();
+  const data=userCache.filter(u=>!needle||String(u.email||'').toLowerCase().includes(needle));
+  body.innerHTML='';
+  for(const u of data){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${escapeHtml(u.email||'')}</td><td>${escapeHtml(u.display_name||'')}</td><td><select data-id="${u.id}" data-field="role"><option value="user" ${u.role==='user'?'selected':''}>user</option><option value="admin" ${u.role==='admin'?'selected':''}>admin</option></select></td><td><select data-id="${u.id}" data-field="status"><option value="pending" ${u.status==='pending'?'selected':''}>pending</option><option value="approved" ${u.status==='approved'?'selected':''}>approved</option><option value="disabled" ${u.status==='disabled'?'selected':''}>disabled</option></select></td><td><button data-save="${u.id}">Save</button></td>`;
+    body.appendChild(tr);
+  }
+  $('#adminMsg').textContent=`Showing ${data.length} of ${userCache.length} account(s).`;
+}
+async function saveUser(id){
+  if(!admin())return;
+  const role=document.querySelector(`select[data-id="${id}"][data-field="role"]`).value;
+  const status=document.querySelector(`select[data-id="${id}"][data-field="status"]`).value;
+  const {error}=await supabaseClient.from('profiles').update({role,status}).eq('id',id);
+  if(error)$('#adminMsg').textContent=error.message;else{await loadUsers();$('#adminMsg').textContent='User updated.'}
+}
 
 $('#loginBtn').onclick=()=>openAuth('login');$('#logoutBtn').onclick=doLogout;$('#closeAuth').onclick=closeAuth;$('#authSubmit').onclick=doAuth;$('#forgotBtn').onclick=forgotPassword;$('#switchAuth').onclick=()=>openAuth(authMode==='login'?'signup':'login');$('#userRows').addEventListener('click',e=>{const b=e.target.closest('[data-save]');if(b)saveUser(b.dataset.save)});$('#userSearch')?.addEventListener('input',e=>renderUsers(e.target.value));$('#userSearchClear')?.addEventListener('click',()=>{if($('#userSearch'))$('#userSearch').value='';renderUsers('')});
 
@@ -300,7 +321,6 @@ const oldSetPage2=originalSetPage;
 function esc(v){return escapeHtml(v)}
 function escAttr(v){return escapeHtml(v)}
 function sortRows(rows){return [...rows].sort((a,b)=>(Number(b.tp)||0)-(Number(a.tp)||0)||(Number(b.win)||0)-(Number(a.win)||0)||(Number(b.kp)||0)-(Number(a.kp)||0))}
-function currentAccess(){return normalizeAccess(currentProfile?.access,currentProfile?.role,currentProfile?.status)}
 function featureAllowed(feature){if(admin())return true;if(feature==='academic'||feature==='zone'||feature==='rotation')return approved();return false}
 function applyUserHubAccess(){}
 async function goPage(p){
@@ -363,7 +383,7 @@ async function renderPublicPointTable(){
 
 function unique(a){return [...new Set(a.filter(v=>v!==null&&v!==undefined&&v!==''))]}
 async function populateBannerTournaments(){await loadTournaments();const t=$('#bannerTournament');if(!t)return;if(!t.value&&tournamentCache[0])t.value=tournamentCache[0].id}
-function loadImage(src){return new Promise(resolve=>{if(!src)return resolve(null);const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=src})}
+function loadImage(src){return new Promise(resolve=>{if(!src)return resolve(null);const im=new Image();im.crossOrigin='anonymous';im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=src})}
 function fitBg(ctx,W,H){const opacity=Math.max(0,Math.min(100,Number($('#bannerBgOpacity')?.value??100)))/100;if(bgImg&&bgImg.complete&&bgImg.naturalWidth){const s=Math.min(W/bgImg.naturalWidth,H/bgImg.naturalHeight);const w=bgImg.naturalWidth*s,h=bgImg.naturalHeight*s;ctx.fillStyle='#030a12';ctx.fillRect(0,0,W,H);ctx.save();ctx.globalAlpha=opacity;ctx.drawImage(bgImg,(W-w)/2,(H-h)/2,w,h);ctx.restore()}else{const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#031522');g.addColorStop(.55,'#061b2b');g.addColorStop(1,'#02060d');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}}
 function cfg(){return {template:$('#bannerTemplate').value,size:$('#bannerSize').value,orgName:$('#bannerOrgName').value,orgColor:$('#bannerOrgColor').value,orgSize:+$('#bannerOrgSize').value,logoSize:+$('#bannerLogoSize').value,logoX:+$('#bannerLogoX').value,logoY:+$('#bannerLogoY').value,cellBg:$('#cellBg').value,cellBorder:$('#cellBorder').value,cellText:$('#cellText').value,bgOpacity:+$('#bannerBgOpacity').value,overlay:+$('#bannerOverlay').value}}
 
