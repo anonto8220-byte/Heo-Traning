@@ -19,12 +19,6 @@ body{background:#02060d url("assets/heo-site-background.png") center top/cover f
 .teamManager{margin-top:14px;padding:14px;border:1px solid #123b56;border-radius:12px;background:#04111c}.teamManager label,.designTools label{display:flex;flex-direction:column;gap:5px;color:#9fc0cf;font-size:11px}.teamManager input,.designTools input,.designTools select{width:100%;padding:9px;background:#04101b;color:#fff;border:1px solid #174963;border-radius:8px}.designTools{grid-template-columns:repeat(3,1fr)}.simpleDesignTools{grid-template-columns:repeat(3,1fr)}.tournamentRow{padding:12px;border-bottom:1px solid #17394b}.tournamentRow:last-child{border-bottom:0}.teamEntryRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px;border-bottom:1px solid #17394b}.teamEntryRow img{width:34px;height:34px;object-fit:contain;border-radius:6px}.pointEditTable{width:100%;border-collapse:collapse}.pointEditTable th,.pointEditTable td{padding:7px;border-bottom:1px solid #17394b;text-align:center}.pointEditTable input{width:70px;padding:7px;background:#04101b;color:#fff;border:1px solid #174963;border-radius:6px}.bannerMeta{font-weight:800;letter-spacing:.4px;text-align:center;margin:12px auto 10px;color:#dceeff}.bannerMeta b{color:#59caff}.templateActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.templateActions input,.templateActions select{padding:8px;background:#04101b;color:#fff;border:1px solid #174963;border-radius:8px}.bannerCanvas{display:block;width:min(100%,900px);height:auto}.bannerInfo{display:grid}.bannerCell{border:1px solid #2ab7ed}.adminSection{display:none}.adminWrap>.adminSection:first-of-type{display:block}.adminWrap>.adminSection#adminTools{display:none}
 @media(max-width:850px){.designTools{grid-template-columns:1fr 1fr}.templateActions{flex-direction:column}.templateActions input,.templateActions select{width:100%}}
 .adminPanel{margin-top:10px}.adminPanel h3{color:#59caff}.simpleDesignTools label{display:flex;flex-direction:column;gap:5px;color:#9fc0cf;font-size:11px}.simpleDesignTools input,.simpleDesignTools select{width:100%;padding:9px;background:#04101b;color:#fff;border:1px solid #174963;border-radius:8px}
-details.designAccordion{margin:8px 0}
-.designTools details{border:1px solid var(--border,#243244);border-radius:10px;padding:7px 9px;background:rgba(255,255,255,.03)}
-.designTools details summary{cursor:pointer;font-weight:800;padding:5px;list-style:none}
-.designTools details summary::-webkit-details-marker{display:none}
-.designGroup{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;padding:8px 2px 2px}
-.designGroup label{min-width:0}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -35,7 +29,7 @@ details.designAccordion{margin:8px 0}
 
 </style>
 
-</head>
+<style id="design-upgrade-css">.designStudioWrap{display:grid;gap:10px}.designToolbar{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:10px 0}.designToolbar>div{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.designCanvasWrap{position:relative;width:min(100%,980px);margin:auto;overflow:auto;background:#02070d;border:1px solid #246d90;border-radius:12px;padding:8px}.designCanvasStage{position:relative;width:max-content;margin:auto;line-height:0}#bannerCanvas{display:block;max-width:none;border-radius:8px;touch-action:none}.designSelection{position:absolute;border:1px solid #59caff;display:none;pointer-events:none;box-shadow:0 0 0 1px #59caff33}.designSelection .br{position:absolute;right:-7px;bottom:-7px;width:14px;height:14px;border:2px solid #061421;background:#59caff;border-radius:3px;pointer-events:auto;cursor:nwse-resize}.designMore{position:relative}.designMoreMenu{position:absolute;right:0;top:44px;z-index:1000;display:none;width:250px;padding:8px;background:#061421;border:1px solid #1b6388;border-radius:12px;box-shadow:0 16px 45px #000b}.designMoreMenu.open{display:block}.designMoreMenu button,.designMoreMenu label,.designMoreMenu select,.designMoreMenu input{display:block;width:100%;margin:4px 0}.designMoreMenu .sep{height:1px;background:#123b56;margin:8px 0}.designSettingsGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.designSettingsGrid label{display:flex;flex-direction:column;gap:4px;color:#9fc0cf;font-size:11px}.designSettingsGrid input{width:100%}@media(max-width:850px){.designSettingsGrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.designSettingsGrid{grid-template-columns:1fr}}</style></head>
 
 <body>
 
@@ -107,7 +101,7 @@ details.designAccordion{margin:8px 0}
 <h2>🛡️ Admin Panel</h2><div class="status">Manage HEO accounts, point tables, design studio, highlights and reports.</div>
 <div id="adminTools" class="adminSection" style="display:none"><div class="pageTitle"><span>🛡️</span><div><h2>HEO Admin Tools</h2><p>Manage tournaments, point tables, design, highlights and reports.</p></div></div>
 <div class="adminTabs"><button class="mini" data-admin-tab="users">👥 User Management</button><button class="mini" data-admin-tab="tournaments">🏆 Tournaments</button><button class="mini" data-admin-tab="points">📊 Point Table</button><button class="mini" data-admin-tab="design">🎨 Design Studio</button><button class="mini" data-admin-tab="highlight">🔥 Highlight</button><button class="mini" data-admin-tab="reports">🚨 Problem Reports</button></div>
-<div id="adminUsers" class="adminPanel"><div class="pageTitle"><span>👤</span><div><h3 style="margin:0;color:#59caff">User Management</h3><p style="margin:3px 0 0;color:#91afbd;font-size:12px">Search members by email and manage approval, status, role and access.</p></div></div><div class="searchRow"><input id="userSearch" type="search" placeholder="Search user by email..."><button id="userSearchClear" type="button">Clear</button></div><div class="adminScroll"><table class="adminTable"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody id="userRows"></tbody></table></div><div id="adminMsg" class="status">Loading users...</div></div>
+<div id="adminUsers" class="adminPanel"><div class="pageTitle"><span>👤</span><div><h3 style="margin:0;color:#59caff">User Management</h3><p style="margin:3px 0 0;color:#91afbd;font-size:12px">Search members by email and manage approval, status and role.</p></div></div><div class="searchRow"><input id="userSearch" type="search" placeholder="Search user by email..."><button id="userSearchClear" type="button">Clear</button></div><div class="adminScroll"><table class="adminTable"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody id="userRows"></tbody></table></div><div id="adminMsg" class="status">Loading users...</div></div>
 
 
 
@@ -118,49 +112,7 @@ details.designAccordion{margin:8px 0}
 <div class="formGrid"><select id="ptTournament"><option value="">Select tournament</option></select><input id="ptTournamentInfo" readonly placeholder="Tournament information appears here"><button id="ptRefresh" type="button">Refresh</button></div>
 <div id="ptEditor" class="contentPanel" style="margin-top:12px"></div><div id="ptMsg" class="status"></div></div>
 
-<div id="adminDesign" class="adminPanel" style="display:none"><h3>🎨 Design Studio</h3>
-<div class="status" style="margin-bottom:10px">Drag the table directly on the canvas. Background stays fixed; all teams, logos and points move together.</div>
-<div class="designTools simpleDesignTools">
-<select id="bannerSize"><option value="1080x1080">1080 × 1080</option><option value="1080x1350">1080 × 1350</option><option value="1200x630">1200 × 630</option></select>
-<select id="bannerTemplate"><option value="classic">Classic Esports</option><option value="sharp">Sharp Esports</option><option value="minimal">Minimal Esports</option></select>
-<select id="bannerTournament"><option value="">Select tournament</option></select>
-<details open><summary>🛡️ Logo Settings</summary><div class="designGroup">
-<label>Show HEO logo <input id="showHeoLogo" type="checkbox" checked></label>
-<label>HEO logo size<input id="bannerLogoSize" type="range" min="45" max="180" value="100"></label>
-<label>Logo X<input id="bannerLogoX" type="range" min="35" max="65" value="50"></label>
-<label>Logo Y<input id="bannerLogoY" type="range" min="2" max="12" value="4"></label>
-</div></details>
-<details><summary>✏️ Text Settings</summary><div class="designGroup">
-<label>Show organisation name <input id="showOrgName" type="checkbox" checked></label>
-<label>Organisation name<input id="bannerOrgName" value="HIDDEN E-SPORTS ORGANISATION"></label>
-<label>Org colour<input id="bannerOrgColor" type="color" value="#ffffff"></label>
-<label>Org size<input id="bannerOrgSize" type="range" min="18" max="70" value="32"></label>
-<label>Header size<input id="headerSize" type="range" min="10" max="44" value="20"></label>
-<label>Rank size<input id="rankSize" type="range" min="10" max="44" value="20"></label>
-<label>Team size<input id="teamSize" type="range" min="10" max="44" value="20"></label>
-<label>Points size<input id="pointsSize" type="range" min="10" max="44" value="20"></label>
-</div></details>
-<details><summary>📦 Table Settings</summary><div class="designGroup">
-<label>Table X<input id="tableX" type="range" min="0" max="100" value="50"></label>
-<label>Table Y<input id="tableY" type="range" min="20" max="90" value="55"></label>
-<label>Table size<input id="tableScale" type="range" min="55" max="140" value="100"></label>
-<label>Table background image<input id="tableBg" type="file" accept="image/png,image/jpeg,image/webp"></label>
-<label>Table background opacity<input id="tableBgOpacity" type="range" min="0" max="100" value="92"></label>
-<label>Cell gap<input id="cellGap" type="range" min="0" max="18" value="6"></label>
-<label>Cell radius<input id="cellRadius" type="range" min="0" max="24" value="7"></label>
-<label>Cell text<input id="cellText" type="color" value="#ffffff"></label>
-</div></details>
-<details><summary>🎨 Banner Settings</summary><div class="designGroup">
-<label>Background<input id="bannerBg" type="file" accept="image/png,image/jpeg,image/webp"></label>
-<div id="bannerBgStatus" class="status" style="margin-top:8px">No background selected.</div>
-<label>Background opacity<input id="bannerBgOpacity" type="range" min="0" max="100" value="100"></label>
-<label>Overlay<input id="bannerOverlay" type="range" min="0" max="90" value="22"></label>
-</div></details>
-</div>
-<div class="templateActions"><input id="templateName" placeholder="Template name"><button id="newTemplate" class="mini">New</button><button id="saveTemplate" class="mini">Save</button><button id="renameTemplate" class="mini">Rename</button><button id="deleteTemplate" class="mini">Delete</button><select id="savedTemplate"><option value="">Saved templates</option></select></div>
-<div style="margin:10px 0"><button id="renderBanner">Render Banner</button><button id="downloadBannerPng" class="mini">Export PNG</button><button id="downloadBannerJpg" class="mini">Export JPG</button><button id="publishBanner" class="mini">Publish Tournament Banner</button></div><div id="publishStatus" class="status" style="margin-top:8px">Select a tournament and render the banner before publishing.</div><canvas id="bannerCanvas" class="bannerCanvas" width="1080" height="1080"></canvas></div>
-
-<div id="adminHighlight" class="adminPanel" style="display:none"><h3>Home Highlight</h3><input id="highlightFile" type="file" accept="image/*,video/mp4,video/webm,video/quicktime"><button id="uploadHighlight">Upload / Replace</button><button id="deleteHighlight" class="mini">Delete</button><div id="highlightMsg" class="status"></div></div>
+<div id="adminDesign" class="adminPanel" style="display:none"><h3>🎨 Design Studio</h3><div class="designStudioWrap"><div class="designToolbar"><div><select id="bannerTournament"><option value="">Select tournament</option></select><select id="bannerSize"><option value="1080x1080">1080 × 1080</option><option value="1080x1350">1080 × 1350</option><option value="1200x630">1200 × 630</option></select><button id="addLogo" type="button">＋ Logo</button><input id="brandingLogoFile" type="file" accept="image/png,image/jpeg,image/webp" style="display:none"><button id="addText" type="button">＋ Text</button></div><div class="designMore"><button id="designMoreBtn" type="button">⋮ More</button><div id="designMoreMenu" class="designMoreMenu"><input id="templateName" placeholder="Design name"><select id="savedTemplate"><option value="">Saved templates</option></select><button id="newTemplate" type="button">New</button><button id="saveTemplate" type="button">Save</button><button id="renameTemplate" type="button">Rename</button><button id="deleteTemplate" type="button">Delete</button><div class="sep"></div><label>Banner background<input id="bannerBg" type="file" accept="image/png,image/jpeg,image/webp"></label><label>Table background<input id="tableBg" type="file" accept="image/png,image/jpeg,image/webp"></label><div class="sep"></div><button id="designSettingsBtn" type="button">⚙ Design settings</button><button id="renderBanner" type="button">Render</button><button id="downloadBannerPng" type="button">Export PNG</button><button id="downloadBannerJpg" type="button">Export JPG</button><button id="publishBanner" type="button">🚀 Publish</button></div></div></div><div id="designSettings" class="contentPanel" style="display:none"><div class="designSettingsGrid"><label>Organisation name<input id="bannerOrgName" value="HIDDEN E-SPORTS ORGANISATION"></label><label>Org colour<input id="bannerOrgColor" type="color" value="#ffffff"></label><label>Org size<input id="bannerOrgSize" type="range" min="18" max="70" value="32"></label><label>HEO logo size<input id="bannerLogoSize" type="range" min="45" max="180" value="100"></label><label>Background opacity<input id="bannerBgOpacity" type="range" min="0" max="100" value="100"></label><label>Overlay<input id="bannerOverlay" type="range" min="0" max="90" value="22"></label><label>Cell radius<input id="cellRadius" type="range" min="0" max="28" value="10"></label><label>Cell shadow<input id="cellShadow" type="range" min="0" max="16" value="5"></label><label>Cell gap<input id="tableGap" type="range" min="0" max="14" value="5"></label><label>Team text size<input id="teamTextSize" type="range" min="18" max="44" value="27"></label><label>Number text size<input id="numberTextSize" type="range" min="18" max="44" value="27"></label><label>Show organisation name<input id="showOrgName" type="checkbox" checked></label><label>Show HEO logo<input id="showHeoLogo" type="checkbox" checked></label><label>Base table width<input id="tableBaseWidth" type="number" min="600" max="1000" value="900"></label></div></div><div id="bannerBgStatus" class="status">Select a tournament to load its point data.</div><div class="designCanvasWrap"><div id="designCanvasStage" class="designCanvasStage"><canvas id="bannerCanvas" class="bannerCanvas" width="1080" height="1080"></canvas><div id="designTableSelection" class="designSelection"><span class="br"></span></div></div></div></div></div><div id="adminHighlight" class="adminPanel" style="display:none"><h3>Home Highlight</h3><input id="highlightFile" type="file" accept="image/*,video/mp4,video/webm,video/quicktime"><button id="uploadHighlight">Upload / Replace</button><button id="deleteHighlight" class="mini">Delete</button><div id="highlightMsg" class="status"></div></div>
 <div id="adminReports" class="adminPanel" style="display:none"><h3>Problem Reports</h3><div id="reportsTable" class="contentPanel">Loading...</div></div></div>
 </div></section>
 <div id="authModal" class="authModal"><div class="authBox"><h2 id="authTitle">Login</h2><input id="authEmail" type="email" autocomplete="email" placeholder="Email"><input id="authPassword" type="password" autocomplete="current-password" placeholder="Password"><div class="authActions"><button id="authSubmit">Login</button><button id="switchAuth">Create account</button><button id="forgotBtn">Forgot password?</button><button id="closeAuth">Close</button></div><div id="authMsg" class="authMsg"></div></div></div>
@@ -172,17 +124,6 @@ details.designAccordion{margin:8px 0}
 <script>
 
 'use strict';
-
-// Safe HTML attribute/text helpers — defined before any UI function can use them.
-function escapeHtml(value){
-  return String(value ?? '').replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[ch]));
-}
-function escapeAttr(value){ return escapeHtml(value); }
-function escAttr(value){ return escapeAttr(value); }
-
-
 
 const MAPS={bermuda:'bermuda.jpg',purgatory:'purgatory.jpg',kalahari:'kalahari.jpg',nexterra:'nexterra.jpg',solara:'solara.jpg'};
 
@@ -338,7 +279,7 @@ const DEFAULT_ACCESS={academic:true,zone:true,rotation:true,pointTable:true,tour
 function normalizeAccess(a,role,status){const x={...DEFAULT_ACCESS,...(a&&typeof a==='object'?a:{})};if(status!=='approved'){for(const k of Object.keys(x))x[k]=false}else if(role==='admin'){for(const k of Object.keys(x))x[k]=true}return x}
 async function loadUsers(){if(!admin()||!supabaseClient)return;const {data,error}=await supabaseClient.from('profiles').select('id,email,display_name,role,status,created_at,access').order('created_at',{ascending:false});const body=$('#userRows');if(error){body.innerHTML='';$('#adminMsg').textContent=error.message;return}userCache=data||[];renderUsers($('#userSearch')?.value||'')}
 function renderUsers(q=''){const body=$('#userRows');if(!body)return;const needle=String(q).trim().toLowerCase();const data=userCache.filter(u=>!needle||String(u.email||'').toLowerCase().includes(needle));body.innerHTML='';for(const u of data){const tr=document.createElement('tr');tr.innerHTML=`<td>${escapeHtml(u.email||'')}</td><td>${escapeHtml(u.display_name||'')}</td><td><select data-id="${u.id}" data-field="role"><option value="user" ${u.role==='user'?'selected':''}>user</option><option value="admin" ${u.role==='admin'?'selected':''}>admin</option></select></td><td><select data-id="${u.id}" data-field="status"><option value="pending" ${u.status==='pending'?'selected':''}>pending</option><option value="approved" ${u.status==='approved'?'selected':''}>approved</option><option value="disabled" ${u.status==='disabled'?'selected':''}>disabled</option></select></td><td><button data-save="${u.id}">Save</button></td>`;body.appendChild(tr)}$('#adminMsg').textContent=`Showing ${data.length} of ${userCache.length} account(s).`}
-async function saveUser(id){if(!admin())return;const role=document.querySelector(`select[data-id="${id}"][data-field="role"]`).value,status=document.querySelector(`select[data-id="${id}"][data-field="status"]`).value;const access={...DEFAULT_ACCESS};if(role!=='admin'&&status!=='approved')Object.keys(access).forEach(k=>access[k]=false);const {error}=await supabaseClient.from('profiles').update({role,status,access}).eq('id',id);if(error)$('#adminMsg').textContent=error.message;else{await loadUsers();$('#adminMsg').textContent='User updated.'}}
+async function saveUser(id){if(!admin())return;const role=document.querySelector(`select[data-id="${id}"][data-field="role"]`).value,status=document.querySelector(`select[data-id="${id}"][data-field="status"]`).value;const {error}=await supabaseClient.from('profiles').update({role,status}).eq('id',id);if(error)$('#adminMsg').textContent=error.message;else{await loadUsers();$('#adminMsg').textContent='User updated.'}}
 
 $('#loginBtn').onclick=()=>openAuth('login');$('#logoutBtn').onclick=doLogout;$('#closeAuth').onclick=closeAuth;$('#authSubmit').onclick=doAuth;$('#forgotBtn').onclick=forgotPassword;$('#switchAuth').onclick=()=>openAuth(authMode==='login'?'signup':'login');$('#userRows').addEventListener('click',e=>{const b=e.target.closest('[data-save]');if(b)saveUser(b.dataset.save)});$('#userSearch')?.addEventListener('input',e=>renderUsers(e.target.value));$('#userSearchClear')?.addEventListener('click',()=>{if($('#userSearch'))$('#userSearch').value='';renderUsers('')});
 
@@ -351,10 +292,13 @@ if(supabaseClient){supabaseClient.auth.onAuthStateChange(()=>setTimeout(loadProf
 const ORG_SECTIONS={pointTable:'Point Table',announcements:'Announcements',news:'HEO News',teams:'Teams',tournaments:'Tournaments',rankings:'Rankings',events:'Events',results:'Results'};
 let ptCache=[],teamCache=[],tournamentCache=[],tournamentTeamCache=[],bgImg=null;
 const oldSetPage2=originalSetPage;
+// Safe HTML helpers used by all public/admin renderers.
+function escapeHtml(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;')}
 function esc(v){return escapeHtml(v)}
+function escAttr(v){return escapeHtml(v)}
 function sortRows(rows){return [...rows].sort((a,b)=>(Number(b.tp)||0)-(Number(a.tp)||0)||(Number(b.win)||0)-(Number(a.win)||0)||(Number(b.kp)||0)-(Number(a.kp)||0))}
 function currentAccess(){return normalizeAccess(currentProfile?.access,currentProfile?.role,currentProfile?.status)}
-function featureAllowed(feature){if(admin()||approved())return true;return !!currentAccess()[feature]}
+function featureAllowed(feature){if(admin())return true;if(feature==='academic'||feature==='zone'||feature==='rotation')return approved();return false}
 function applyUserHubAccess(){}
 async function goPage(p){
   if(p==='admin'&&!admin()){openAuth('login');return}
@@ -369,38 +313,14 @@ async function goPage(p){
 }
 $$('[data-nav]').forEach(b=>b.onclick=()=>goPage(b.dataset.nav));
 $('#academicLogin')?.addEventListener('click',()=>openAuth('login'));
-$$('[data-org]').forEach(b=>b.onclick=async()=>{const key=b.dataset.org;if(key==='pointTable')await renderPublicPointTable();else $('#orgContent').innerHTML='<h3>'+esc(ORG_SECTIONS[key])+'</h3><p class="status">This public section is ready for future HEO content.</p>'});
+$$('[data-org]').forEach(b=>b.onclick=async()=>{const key=b.dataset.org;if(key==='pointTable')await renderPublicPointTable();else if(key==='tournaments')await renderPublicTournaments();else $('#orgContent').innerHTML='<h3>'+esc(ORG_SECTIONS[key])+'</h3><p class="status">This public section is ready for future HEO content.</p>'});
 
 async function getPointRows(){if(!supabaseClient)return [];const {data,error}=await supabaseClient.from('pt_entries').select('*').order('created_at',{ascending:false});if(error){console.error(error);return []}return data||[]}
 async function loadTournaments(){if(!admin()||!supabaseClient)return;const {data,error}=await supabaseClient.from('heo_tournaments').select('*').order('created_at',{ascending:false});if(error){$('#tournamentList').innerHTML='<div class="status">'+esc(error.message)+'</div>';return}tournamentCache=data||[];renderTournamentList();fillTournamentSelects();}
 function fillTournamentSelects(){const els=[$('#ptTournament'),$('#bannerTournament')];els.forEach(sel=>{if(!sel)return;const old=sel.value;sel.innerHTML='<option value="">Select tournament</option>'+tournamentCache.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');if(tournamentCache.some(t=>t.id===old))sel.value=old})}
 function tournamentById(id){return tournamentCache.find(t=>t.id===id)}
 function renderTournamentList(){const box=$('#tournamentList');if(!box)return;if(!tournamentCache.length){box.innerHTML='<div class="status">No tournaments yet.</div>';return}box.innerHTML=tournamentCache.map(t=>`<div class="tournamentRow"><b>${esc(t.name)}</b><div class="status">Round ${esc(t.round||'—')} • Day ${esc(t.day||'—')} • Week ${esc(t.week||'—')}</div><div id="tTeams-${t.id}" class="teamEntryRow">Loading teams...</div><div style="margin-top:8px"><button class="mini" onclick="openTeamModal('${t.id}')">+ Add Team</button> <button class="mini" onclick="openTournamentTeams('${t.id}')">Refresh Teams</button> <button class="mini" onclick="deleteTournament('${t.id}')">Delete Tournament</button></div></div>`).join('');tournamentCache.forEach(t=>openTournamentTeams(t.id));}
-async function openTournamentTeams(tid){
-  const box=$('#tTeams-'+tid);
-  if(!box||!supabaseClient)return;
-  box.innerHTML='<span class="status">Loading teams...</span>';
-  try{
-    const rel=await supabaseClient.from('heo_tournament_teams').select('id,team_id,created_at').eq('tournament_id',tid).order('created_at');
-    if(rel.error)throw rel.error;
-    const ids=[...(rel.data||[])].map(x=>x.team_id).filter(Boolean);
-    if(!ids.length){box.innerHTML='<span class="status">No teams in this tournament.</span>';return;}
-    const teams=await supabaseClient.from('heo_teams').select('id,team_name,logo_url').in('id',ids);
-    if(teams.error)throw teams.error;
-    const byId=new Map((teams.data||[]).map(t=>[t.id,t]));
-    box.innerHTML=(rel.data||[]).map(x=>{
-      const t=byId.get(x.team_id);
-      if(!t)return '';
-      return `<span style="display:inline-flex;align-items:center;gap:6px;margin:3px 8px 3px 0">
-        ${t.logo_url?`<img src="${escapeAttr(t.logo_url)}" style="width:26px;height:26px;object-fit:contain;border-radius:5px">`:''}
-        <b>${escapeHtml(t.team_name||'')}</b>
-        <button class="mini" onclick="removeTournamentTeam('${escapeAttr(x.id)}','${escapeAttr(tid)}')">Delete</button>
-      </span>`;
-    }).join('')||'<span class="status">No teams in this tournament.</span>';
-  }catch(error){
-    box.innerHTML='<span class="status">Could not load teams: '+escapeHtml(error?.message||error)+'</span>';
-  }
-}
+async function openTournamentTeams(tid){const box=$('#tTeams-'+tid);if(!box)return;const {data,error}=await supabaseClient.from('heo_tournament_teams').select('id,team_id,heo_teams(id,team_name,logo_url)').eq('tournament_id',tid).order('created_at');if(error){box.innerHTML='<span class="status">'+esc(error.message)+'</span>';return}box.innerHTML=(data||[]).map(x=>`<span style="display:inline-flex;align-items:center;gap:6px;margin:3px 8px 3px 0">${x.heo_teams?.logo_url?`<img src="${escAttr(x.heo_teams.logo_url)}" style="width:26px;height:26px;object-fit:contain;border-radius:5px">`:''}<b>${esc(x.heo_teams?.team_name||'')}</b><button class="mini" onclick="removeTournamentTeam('${x.id}','${tid}')">Delete</button></span>`).join('')||'<span class="status">No teams in this tournament.</span>'}
 $('#tournamentForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!admin())return;const f=new FormData(e.target);const row={name:String(f.get('name')).trim(),round:String(f.get('round')||'').trim(),day:String(f.get('day')||'').trim(),week:String(f.get('week')||'').trim()};const {error}=await supabaseClient.from('heo_tournaments').insert(row);$('#tournamentMsg').textContent=error?error.message:'Tournament created.';if(!error){e.target.reset();await loadTournaments();await loadAllTeams();}});
 window.deleteTournament=async id=>{if(!admin())return;if(!confirm('Delete this tournament and its point entries/team links?'))return;try{const a=await supabaseClient.from('pt_entries').delete().eq('tournament_id',id);if(a.error)throw new Error(a.error.message);const b=await supabaseClient.from('heo_tournament_teams').delete().eq('tournament_id',id);if(b.error)throw new Error(b.error.message);const c=await supabaseClient.from('heo_tournaments').delete().eq('id',id);if(c.error)throw new Error(c.error.message);$('#tournamentMsg').textContent='Tournament deleted.';await loadTournaments();if($('#ptTournament'))$('#ptTournament').value='';$('#ptEditor').innerHTML='<div class="status">Select a tournament to load its point table.</div>'}catch(err){$('#tournamentMsg').textContent='Delete failed: '+err.message}};
 window.removeTournamentTeam=async(id,tid)=>{if(!admin())return;const {data:rel}=await supabaseClient.from('heo_tournament_teams').select('team_id').eq('id',id).maybeSingle();const {error}=await supabaseClient.from('heo_tournament_teams').delete().eq('id',id);if(error){$('#tournamentMsg').textContent=error.message;return}if(rel?.team_id)await supabaseClient.from('pt_entries').delete().eq('tournament_id',tid).eq('team_id',rel.team_id);await openTournamentTeams(tid);if($('#ptTournament').value===tid)await loadPointTable()};
@@ -411,242 +331,76 @@ async function addTeamToTournament(tid,name,file){if(!tid)throw new Error('Tourn
 window.openTeamModal=function(tid){if(!admin())return;const t=tournamentById(tid);$('#teamModal').classList.add('open');$('#teamModal').dataset.tid=tid;$('#teamModalTournament').textContent=`Tournament: ${t?.name||'—'} • Round ${t?.round||'—'} • Day ${t?.day||'—'} • Week ${t?.week||'—'}`;$('#tournamentTeamName').value='';$('#tournamentTeamLogo').value='';$('#tournamentTeamMsg').textContent=''};
 $('#teamModalClose')?.addEventListener('click',()=>$('#teamModal').classList.remove('open'));
 $('#tournamentTeamSave')?.addEventListener('click',async()=>{if(!admin())return;const tid=$('#teamModal').dataset.tid,name=$('#tournamentTeamName').value.trim(),file=$('#tournamentTeamLogo').files[0];if(!name){$('#tournamentTeamMsg').textContent='Enter team name.';return}const btn=$('#tournamentTeamSave');btn.disabled=true;$('#tournamentTeamMsg').textContent='Saving team...';try{await addTeamToTournament(tid,name,file);$('#tournamentTeamMsg').textContent='Team added successfully.';await openTournamentTeams(tid);if($('#ptTournament').value===tid)await loadPointTable();setTimeout(()=>$('#teamModal').classList.remove('open'),350)}catch(err){$('#tournamentTeamMsg').textContent=err.message}finally{btn.disabled=false}});
-async function loadPointTable(){if(!admin()||!supabaseClient)return;const tid=$('#ptTournament')?.value;if(!tid){$('#ptEditor').innerHTML='<div class="status">Select a tournament to load its point table.</div>';return}const t=tournamentById(tid);$('#ptTournamentInfo').value=`${t?.name||''} • Round ${t?.round||'—'} • Day ${t?.day||'—'} • Week ${t?.week||'—'}`;const rel=await supabaseClient.from('heo_tournament_teams').select('team_id').eq('tournament_id',tid).order('created_at');if(rel.error){$('#ptEditor').innerHTML='<div class="status">'+escapeHtml(rel.error.message)+'</div>';return}const teamIds=[...(rel.data||[])].map(x=>x.team_id).filter(Boolean);if(!teamIds.length){$('#ptEditor').innerHTML='<div class="status">No teams have been added to this tournament yet.</div>';ptCache=[];return}const tq=await supabaseClient.from('heo_teams').select('id,team_name,logo_url').in('id',teamIds);if(tq.error){$('#ptEditor').innerHTML='<div class="status">'+escapeHtml(tq.error.message)+'</div>';return}const teamMap=new Map((tq.data||[]).map(x=>[x.id,x]));const teams=teamIds.map(id=>teamMap.get(id)).filter(Boolean);const q=await supabaseClient.from('pt_entries').select('*').eq('tournament_id',tid);if(q.error){$('#ptEditor').innerHTML='<div class="status">'+esc(q.error.message)+'</div>';return}let entries=q.data||[];for(const team of teams){let row=entries.find(x=>x.team_id===team.id);if(!row)row=entries.find(x=>!x.team_id&&String(x.team_name||'').toLowerCase()===String(team.team_name||'').toLowerCase());if(row&&!row.team_id){const u=await supabaseClient.from('pt_entries').update({team_id:team.id,logo_url:team.logo_url||null,team_name:team.team_name,tournament:t?.name||'',round:t?.round||'',day:t?.day||'',week:t?.week||''}).eq('id',row.id).select().single();if(!u.error)Object.assign(row,u.data)}else if(!row){const ins=await supabaseClient.from('pt_entries').insert({tournament_id:tid,team_id:team.id,team_name:team.team_name,logo_url:team.logo_url||null,tournament:t?.name||'',round:t?.round||'',day:t?.day||'',week:t?.week||'',mp:0,win:0,pp:0,kp:0}).select().single();if(!ins.error){row=ins.data;entries.push(row)}}else if(row.logo_url!==team.logo_url||row.team_name!==team.team_name){const u=await supabaseClient.from('pt_entries').update({team_name:team.team_name,logo_url:team.logo_url||null}).eq('id',row.id).select().single();if(!u.error)Object.assign(row,u.data)}}ptCache=entries.filter(x=>teams.some(t=>t.id===x.team_id));const rows=sortRows(ptCache);let html=`<div class="bannerMeta"><b>${esc(t?.name||'')}</b> &nbsp; | &nbsp; Round ${esc(t?.round||'—')} &nbsp; | &nbsp; Day ${esc(t?.day||'—')} &nbsp; | &nbsp; Week ${esc(t?.week||'—')}</div>`;html+='<div style="overflow:auto"><table class="pointEditTable"><thead><tr><th>RANK</th><th></th><th>TEAM</th><th>MP</th><th>WIN</th><th>PP</th><th>KP</th><th>TP</th><th>Action</th></tr></thead><tbody>';let prev=null,rank=0;rows.forEach((x,i)=>{const sig=`${x.tp}|${x.win}|${x.kp}`;if(sig!==prev)rank=i+1;prev=sig;html+=`<tr><td>${String(rank).padStart(2,'0')}</td><td>${x.logo_url?`<img class="teamLogo" src="${escAttr(x.logo_url)}">`:''}</td><td><b>${esc(x.team_name)}</b></td><td><input data-pid="${x.id}" data-k="mp" type="number" min="0" value="${Number(x.mp)||0}"></td><td><input data-pid="${x.id}" data-k="win" type="number" min="0" value="${Number(x.win)||0}"></td><td><input data-pid="${x.id}" data-k="pp" type="number" min="0" value="${Number(x.pp)||0}"></td><td><input data-pid="${x.id}" data-k="kp" type="number" min="0" value="${Number(x.kp)||0}"></td><td><b>${Number(x.tp)||0}</b></td><td><button class="mini" onclick="savePointRow('${x.id}')">Save</button><button class="mini" onclick="deletePointRow('${x.id}')">Delete</button></td></tr>`});html+='</tbody></table></div>';$('#ptEditor').innerHTML=html;$('#ptMsg').textContent=teams.length?`${teams.length} team(s) loaded from this tournament.`:'No teams have been added to this tournament yet.'}
+async function loadPointTable(){if(!admin()||!supabaseClient)return;const tid=$('#ptTournament')?.value;if(!tid){$('#ptEditor').innerHTML='<div class="status">Select a tournament to load its point table.</div>';return}const t=tournamentById(tid);$('#ptTournamentInfo').value=`${t?.name||''} • Round ${t?.round||'—'} • Day ${t?.day||'—'} • Week ${t?.week||'—'}`;const rel=await supabaseClient.from('heo_tournament_teams').select('team_id, heo_teams(id,team_name,logo_url)').eq('tournament_id',tid).order('created_at');if(rel.error){$('#ptEditor').innerHTML='<div class="status">'+esc(rel.error.message)+'</div>';return}const teams=(rel.data||[]).map(x=>x.heo_teams).filter(Boolean);const q=await supabaseClient.from('pt_entries').select('*').eq('tournament_id',tid);if(q.error){$('#ptEditor').innerHTML='<div class="status">'+esc(q.error.message)+'</div>';return}let entries=q.data||[];for(const team of teams){let row=entries.find(x=>x.team_id===team.id);if(!row)row=entries.find(x=>!x.team_id&&String(x.team_name||'').toLowerCase()===String(team.team_name||'').toLowerCase());if(row&&!row.team_id){const u=await supabaseClient.from('pt_entries').update({team_id:team.id,logo_url:team.logo_url||null,team_name:team.team_name,tournament:t?.name||'',round:t?.round||'',day:t?.day||'',week:t?.week||''}).eq('id',row.id).select().single();if(!u.error)Object.assign(row,u.data)}else if(!row){const ins=await supabaseClient.from('pt_entries').insert({tournament_id:tid,team_id:team.id,team_name:team.team_name,logo_url:team.logo_url||null,tournament:t?.name||'',round:t?.round||'',day:t?.day||'',week:t?.week||'',mp:0,win:0,pp:0,kp:0}).select().single();if(!ins.error){row=ins.data;entries.push(row)}}else if(row.logo_url!==team.logo_url||row.team_name!==team.team_name){const u=await supabaseClient.from('pt_entries').update({team_name:team.team_name,logo_url:team.logo_url||null}).eq('id',row.id).select().single();if(!u.error)Object.assign(row,u.data)}}ptCache=entries.filter(x=>teams.some(t=>t.id===x.team_id));const rows=sortRows(ptCache);let html=`<div class="bannerMeta"><b>${esc(t?.name||'')}</b> &nbsp; | &nbsp; Round ${esc(t?.round||'—')} &nbsp; | &nbsp; Day ${esc(t?.day||'—')} &nbsp; | &nbsp; Week ${esc(t?.week||'—')}</div>`;html+='<div style="overflow:auto"><table class="pointEditTable"><thead><tr><th>RANK</th><th></th><th>TEAM</th><th>MP</th><th>WIN</th><th>PP</th><th>KP</th><th>TP</th><th>Action</th></tr></thead><tbody>';let prev=null,rank=0;rows.forEach((x,i)=>{const sig=`${x.tp}|${x.win}|${x.kp}`;if(sig!==prev)rank=i+1;prev=sig;html+=`<tr><td>${String(rank).padStart(2,'0')}</td><td>${x.logo_url?`<img class="teamLogo" src="${escAttr(x.logo_url)}">`:''}</td><td><b>${esc(x.team_name)}</b></td><td><input data-pid="${x.id}" data-k="mp" type="number" min="0" value="${Number(x.mp)||0}"></td><td><input data-pid="${x.id}" data-k="win" type="number" min="0" value="${Number(x.win)||0}"></td><td><input data-pid="${x.id}" data-k="pp" type="number" min="0" value="${Number(x.pp)||0}"></td><td><input data-pid="${x.id}" data-k="kp" type="number" min="0" value="${Number(x.kp)||0}"></td><td><b>${Number(x.tp)||0}</b></td><td><button class="mini" onclick="savePointRow('${x.id}')">Save</button><button class="mini" onclick="deletePointRow('${x.id}')">Delete</button></td></tr>`});html+='</tbody></table></div>';$('#ptEditor').innerHTML=html;$('#ptMsg').textContent=teams.length?`${teams.length} team(s) loaded from this tournament.`:'No teams have been added to this tournament yet.'}
 window.savePointRow=async id=>{if(!admin())return;const vals={};document.querySelectorAll(`[data-pid="${id}"]`).forEach(i=>vals[i.dataset.k]=Number(i.value)||0);const {error}=await supabaseClient.from('pt_entries').update(vals).eq('id',id);$('#ptMsg').textContent=error?error.message:'Point entry saved.';await loadPointTable()};
 window.deletePointRow=async id=>{if(!admin())return;const {error}=await supabaseClient.from('pt_entries').delete().eq('id',id);if(error){$('#ptMsg').textContent=error.message;return}$('#ptMsg').textContent='Point entry deleted. The team remains registered in this tournament.';await loadPointTable();await loadTournaments()};
 $('#ptTournament')?.addEventListener('change',async()=>{await loadPointTable();await openTournamentTeams($('#ptTournament').value)});$('#ptRefresh')?.addEventListener('click',loadPointTable);
 
+async function renderPublicTournaments(){
+  const box=$('#orgContent');
+  box.innerHTML='<h3>🏆 Tournaments</h3><div class="searchRow"><input id="publicTournamentSearch" type="search" placeholder="Search tournament by name..."><button id="publicTournamentClear" type="button">Clear</button></div><div id="publicTournamentList" class="contentPanel">Loading...</div>';
+  if(!supabaseClient){$('#publicTournamentList').innerHTML='<div class="status">Supabase is not configured.</div>';return}
+  const {data,error}=await supabaseClient.from('heo_tournaments').select('id,name,round,day,week,created_at').order('created_at',{ascending:false});
+  if(error){$('#publicTournamentList').innerHTML='<div class="status">'+esc(error.message)+'</div>';return}
+  const rows=data||[];
+  const render=()=>{const q=($('#publicTournamentSearch').value||'').trim().toLowerCase();const filtered=rows.filter(t=>!q||String(t.name||'').toLowerCase().includes(q));$('#publicTournamentList').innerHTML=filtered.length?filtered.map(t=>`<div class="tournamentRow"><b>${esc(t.name)}</b><div class="status">Round ${esc(t.round||'—')} • Day ${esc(t.day||'—')} • Week ${esc(t.week||'—')}</div></div>`).join(''):'<div class="status">No matching tournaments.</div>'};
+  render();$('#publicTournamentSearch').addEventListener('input',render);$('#publicTournamentClear').addEventListener('click',()=>{$('#publicTournamentSearch').value='';render()});
+}
 async function renderPublicPointTable(){
   const box=$('#orgContent');
-  box.innerHTML='<h3>📊 Published Point Tables</h3><div class="status">Loading published banners...</div>';
-  if(!supabaseClient){box.innerHTML='<div class="status">Supabase is not configured.</div>';return}
-  const {data:ts,error:te}=await supabaseClient
-    .from('heo_tournaments')
-    .select('id,name,round,day,week,published,published_image_url,published_jpg_url,published_at')
-    .eq('published',true)
-    .order('published_at',{ascending:false});
-  if(te){box.innerHTML='<div class="status">'+esc(te.message)+'</div>';return}
-  const published=(ts||[]).filter(t=>t.published_image_url||t.published_jpg_url);
-  if(!published.length){box.innerHTML='<h3>📊 Published Point Tables</h3><div class="status">No published point table is available yet.</div>';return}
-  const options=published.map(t=>`<option value="${escAttr(t.id)}">${esc(t.name)}</option>`).join('');
-  box.innerHTML=`<h3>📊 Published Point Tables</h3>
-    <div class="bannerMeta"><b>Select Tournament</b></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0 14px">
-      <select id="publicPublishedTournament" style="flex:1;min-width:220px"><option value="">Select tournament</option>${options}</select>
-      <button id="publicBannerDownloadPng" type="button">Download PNG</button>
-      <button id="publicBannerDownloadJpg" type="button">Download JPG</button>
-    </div>
-    <div id="publicPublishedMeta" class="status"></div>
-    <div id="publicPublishedBanner" style="margin-top:12px;text-align:center"></div>`;
-  const sel=$('#publicPublishedTournament');
-  const render=()=>{
-    const t=published.find(x=>x.id===sel.value)||published[0];
-    sel.value=t.id;
-    const banner=$('#publicPublishedBanner');
-    const meta=$('#publicPublishedMeta');
-    const png=t.published_image_url;
-    const jpg=t.published_jpg_url;
-    const chosen=png||jpg;
-    meta.textContent=`${t.name} • Round ${t.round||'—'} • Day ${t.day||'—'} • Week ${t.week||'—'}`;
-    banner.innerHTML=`<img src="${escAttr(chosen)}" alt="${escAttr(t.name)} published point table banner" style="display:block;max-width:100%;width:auto;height:auto;margin:0 auto;border-radius:10px">`;
-    const dp=$('#publicBannerDownloadPng'),dj=$('#publicBannerDownloadJpg');
-    dp.disabled=!png;dj.disabled=!jpg;
-    dp.onclick=()=>{if(png){const a=document.createElement('a');a.href=png;a.download=(t.name||'HEO-Point-Table')+'.png';a.target='_blank';a.rel='noopener';a.click()}};
-    dj.onclick=()=>{if(jpg){const a=document.createElement('a');a.href=jpg;a.download=(t.name||'HEO-Point-Table')+'.jpg';a.target='_blank';a.rel='noopener';a.click()}};
-  };
-  sel.addEventListener('change',render);
-  render();
+  box.innerHTML='<h3>📊 Point Table</h3><div class="formGrid"><select id="publicPtTournament"><option value="">Select tournament</option></select></div><div id="publicPtView" class="contentPanel" style="margin-top:12px"><div class="status">Select a tournament.</div></div>';
+  if(!supabaseClient){$('#publicPtView').innerHTML='<div class="status">Supabase is not configured.</div>';return}
+  const {data:ts,error}=await supabaseClient.from('heo_tournaments').select('id,name,round,day,week,published,published_image_url,published_jpg_url,published_at').eq('published',true).order('created_at',{ascending:false});
+  if(error){$('#publicPtView').innerHTML='<div class="status">'+esc(error.message)+'</div>';return}
+  const sel=$('#publicPtTournament');
+  (ts||[]).forEach(t=>{const o=document.createElement('option');o.value=t.id;o.textContent=t.name;sel.appendChild(o)});
+  const show=()=>{const t=(ts||[]).find(x=>x.id===sel.value);const v=$('#publicPtView');if(!t){v.innerHTML='<div class="status">Select a published tournament.</div>';return}if(!t.published_image_url){v.innerHTML='<div class="status">This tournament has not been published yet.</div>';return}v.innerHTML=`<div class="bannerMeta"><b>${esc(t.name)}</b> • Round ${esc(t.round||'—')} • Day ${esc(t.day||'—')} • Week ${esc(t.week||'—')}</div><img class="bannerCanvas" src="${escAttr(t.published_image_url)}" alt="${escAttr(t.name)} published point table"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a class="mini" href="${escAttr(t.published_image_url)}" download="HEO-${escAttr(t.name)}-Point-Table.png" target="_blank">Download PNG</a>${t.published_jpg_url?`<a class="mini" href="${escAttr(t.published_jpg_url)}" download="HEO-${escAttr(t.name)}-Point-Table.jpg" target="_blank">Download JPG</a>`:''}</div>`};
+  sel.addEventListener('change',show);if(ts?.[0]){sel.value=ts[0].id;show()}
 }
+
 function unique(a){return [...new Set(a.filter(v=>v!==null&&v!==undefined&&v!==''))]}
-async function populateBannerTournaments(){await loadTournaments();const t=$('#bannerTournament');if(!t)return;if(!t.value&&tournamentCache[0])t.value=tournamentCache[0].id}
-function loadImage(src){return new Promise(resolve=>{if(!src)return resolve(null);const im=new Image();im.crossOrigin='anonymous';im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=src})}
-function fitBg(ctx,W,H){const opacity=Math.max(0,Math.min(100,Number($('#bannerBgOpacity')?.value??100)))/100;if(bgImg&&bgImg.complete&&bgImg.naturalWidth){const s=Math.min(W/bgImg.naturalWidth,H/bgImg.naturalHeight);const w=bgImg.naturalWidth*s,h=bgImg.naturalHeight*s;ctx.fillStyle='#030a12';ctx.fillRect(0,0,W,H);ctx.save();ctx.globalAlpha=opacity;ctx.drawImage(bgImg,(W-w)/2,(H-h)/2,w,h);ctx.restore()}else{const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#031522');g.addColorStop(.55,'#061b2b');g.addColorStop(1,'#02060d');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}}
-function cfg(){return {template:$('#bannerTemplate').value,size:$('#bannerSize').value,orgName:$('#bannerOrgName').value,showOrgName:$('#showOrgName').checked,orgColor:$('#bannerOrgColor').value,orgSize:+$('#bannerOrgSize').value,logoSize:+$('#bannerLogoSize').value,logoX:+$('#bannerLogoX').value,logoY:+$('#bannerLogoY').value,showHeoLogo:$('#showHeoLogo').checked,tableX:+$('#tableX').value,tableY:+$('#tableY').value,tableScale:+$('#tableScale').value,headerSize:+$('#headerSize').value,rankSize:+$('#rankSize').value,teamSize:+$('#teamSize').value,pointsSize:+$('#pointsSize').value,tableBgOpacity:+$('#tableBgOpacity').value,cellText:$('#cellText').value,cellGap:+$('#cellGap').value,cellRadius:+$('#cellRadius').value,bgOpacity:+$('#bannerBgOpacity').value,overlay:+$('#bannerOverlay').value}}
+async function populateBannerTournaments(){await loadTournaments();const s=$('#bannerTournament');if(s&&!s.value&&tournamentCache[0])s.value=tournamentCache[0].id}
+function loadImage(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+function fitBg(ctx,W,H){const op=(+$('#bannerBgOpacity')?.value||100)/100;if(bgImg?.complete&&bgImg.naturalWidth){const s=Math.max(W/bgImg.naturalWidth,H/bgImg.naturalHeight),w=bgImg.naturalWidth*s,h=bgImg.naturalHeight*s;ctx.save();ctx.globalAlpha=op;ctx.drawImage(bgImg,(W-w)/2,(H-h)/2,w,h);ctx.restore()}else{ctx.fillStyle='#04101b';ctx.fillRect(0,0,W,H)}}
+function cfg(){return{size:$('#bannerSize').value,orgName:$('#bannerOrgName').value,orgColor:$('#bannerOrgColor').value,orgSize:+$('#bannerOrgSize').value,logoSize:+$('#bannerLogoSize').value,bgOpacity:+$('#bannerBgOpacity').value,overlay:+$('#bannerOverlay').value,cellRadius:+$('#cellRadius').value,cellShadow:+$('#cellShadow').value,tableGap:+$('#tableGap').value,teamTextSize:+$('#teamTextSize').value,numberTextSize:+$('#numberTextSize').value,showOrgName:$('#showOrgName').checked,showHeoLogo:$('#showHeoLogo').checked,tableBaseWidth:+$('#tableBaseWidth').value||900}}
+let templateCache=[],tableBgImg=null;const designState={table:{x:0,y:0,w:0,h:0},selected:'table',extras:[],tableBgPath:null,bannerBgPath:null};
+function metrics(rows){const C=cfg(),w=Math.max(600,Math.min(1000,C.tableBaseWidth||900)),g=Math.max(2,Math.min(10,C.tableGap||5)),u=w-g*7,cols=[.09,.06,.29,.10,.10,.11,.12,.13].map(v=>u*v);return{w,h:58+Math.max(1,rows.length)*54,g,cols,hh:58,rh:54}}
+function rr(ctx,x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function cell(ctx,x,y,w,h,M,C,W,H){ctx.save();rr(ctx,x,y,w,h,C.cellRadius);ctx.clip();if(tableBgImg?.complete&&tableBgImg.naturalWidth){const s=Math.max(M.w/tableBgImg.naturalWidth,M.h/tableBgImg.naturalHeight),iw=tableBgImg.naturalWidth*s,ih=tableBgImg.naturalHeight*s;ctx.drawImage(tableBgImg,(M.w-iw)/2,(M.h-ih)/2,iw,ih)}else{ctx.fillStyle='#071c2c';ctx.fill()}ctx.restore();if(C.cellShadow>0){ctx.save();rr(ctx,x,y,w,h,C.cellRadius);ctx.fillStyle='rgba(255,255,255,.012)';ctx.shadowColor='rgba(0,0,0,.38)';ctx.shadowBlur=C.cellShadow;ctx.shadowOffsetY=1;ctx.fill();ctx.restore()}}
+function designRows(){return sortRows(ptCache.filter(x=>x.tournament_id===$('#bannerTournament').value)).slice(0,14)}
+function updateSelection(){const s=$('#designTableSelection'),c=$('#bannerCanvas');if(!s||!c){return}const r=c.getBoundingClientRect(),sx=r.width/c.width,sel=designState.selected;if(!sel){s.style.display='none';return}let t;if(sel==='table')t=designState.table;else{t=designState.extras.find(o=>o.id===sel);if(!t){s.style.display='none';return}}s.style.display='block';s.style.left=t.x*sx+'px';s.style.top=t.y*sx+'px';s.style.width=t.w*sx+'px';s.style.height=t.h*sx+'px'}
+function extraAt(px,py){for(let i=designState.extras.length-1;i>=0;i--){const o=designState.extras[i];if(px>=o.x&&px<=o.x+o.w&&py>=o.y&&py<=o.y+o.h)return o}return null}
+async function drawExtra(ctx,o){ctx.save();ctx.translate(o.x+o.w/2,o.y+o.h/2);ctx.rotate((o.rot||0)*Math.PI/180);if(o.type==='image'&&o.src){const img=o.image||await loadImage(o.src);if(img){o.image=img;ctx.drawImage(img,-o.w/2,-o.h/2,o.w,o.h)}}else if(o.type==='text'){ctx.fillStyle=o.color||'#fff';const fs=Math.max(12,(o.size||48)*((o.h||70)/(o.baseH||o.h||70)));ctx.font=`900 ${fs}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(o.text||'Text',0,0)}ctx.restore()}
+async function renderBanner(){const c=$('#bannerCanvas');if(!c)return;const [W,H]=$('#bannerSize').value.split('x').map(Number);c.width=W;c.height=H;const ctx=c.getContext('2d');const C=cfg();fitBg(ctx,W,H);ctx.fillStyle=`rgba(0,5,12,${C.overlay/100})`;ctx.fillRect(0,0,W,H);const t=tournamentById($('#bannerTournament').value);if(t)await loadPointTableForDesign(t.id);const rows=designRows(),M=metrics(rows);if(!designState.table.w){designState.table.w=M.w;designState.table.h=M.h;designState.table.x=(W-M.w)/2;designState.table.y=Math.max(20,(H-M.h)*.5)}else{const ratio=M.h/M.w;designState.table.h=designState.table.w*ratio;designState.table.x=Math.max(0,Math.min(W-designState.table.w,designState.table.x));designState.table.y=Math.max(0,Math.min(H-designState.table.h,designState.table.y))}const heo=await loadImage('assets/heo-logo.jpg');let top=24;if(C.showHeoLogo&&heo){const s=Math.min(C.logoSize,W*.12);ctx.drawImage(heo,W/2-s/2,top,s,s);top+=s+12}if(C.showOrgName){ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.fillStyle=C.orgColor;ctx.font=`900 ${C.orgSize}px Arial`;ctx.fillText(C.orgName,W/2,top+C.orgSize);top+=C.orgSize+20}const T=designState.table,sc=T.w/M.w;ctx.save();ctx.translate(T.x,T.y);ctx.scale(sc,sc);let x=0;const headers=['RANK','','TEAM','MP','WIN','PP','KP','TP'];for(let i=0;i<8;i++){cell(ctx,x,0,M.cols[i],M.hh,M,C,M.w,M.h);if(headers[i]){ctx.fillStyle='#8fe2ff';ctx.font=`900 ${C.numberTextSize}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(headers[i],x+M.cols[i]/2,M.hh/2)}x+=M.cols[i]+M.g}const imgs=await Promise.all(rows.map(r=>loadImage(r.logo_url)));rows.forEach((r,i)=>{const y=M.hh+i*M.rh;x=0;for(let j=0;j<8;j++){cell(ctx,x,y,M.cols[j],M.rh,M,C,M.w,M.h);x+=M.cols[j]+M.g}ctx.fillStyle='#fff';ctx.font=`900 ${C.numberTextSize}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(i+1).padStart(2,'0'),M.cols[0]/2,y+M.rh/2);x=M.cols[0]+M.g;const ss=Math.min(M.rh-10,M.cols[1]-8);if(imgs[i])ctx.drawImage(imgs[i],x+(M.cols[1]-ss)/2,y+(M.rh-ss)/2,ss,ss);x+=M.cols[1]+M.g;[r.team_name||'',r.mp||0,r.win||0,r.pp||0,r.kp||0,r.tp||0].forEach((v,j)=>{ctx.fillStyle=j===5?'#ffd21a':'#fff';ctx.font=`${j===0?'900':'800'} ${j===0?C.teamTextSize:C.numberTextSize}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(v),x+M.cols[j+2]/2,y+M.rh/2);x+=M.cols[j+2]+M.g})});ctx.restore();for(const o of designState.extras)await drawExtra(ctx,o);updateSelection()}
+async function loadPointTableForDesign(tid){if(!supabaseClient||!tid)return;const rel=await supabaseClient.from('heo_tournament_teams').select('team_id, heo_teams(id,team_name,logo_url)').eq('tournament_id',tid).order('created_at');if(rel.error){ptCache=[];$('#bannerBgStatus').textContent=rel.error.message;return}const q=await supabaseClient.from('pt_entries').select('*').eq('tournament_id',tid);if(q.error){ptCache=[];$('#bannerBgStatus').textContent=q.error.message;return}const e=q.data||[];ptCache=(rel.data||[]).map(x=>{const row=e.find(r=>r.team_id===x.heo_teams?.id)||{};return{tournament_id:tid,team_id:x.heo_teams?.id,team_name:x.heo_teams?.team_name||'',logo_url:x.heo_teams?.logo_url||null,mp:+row.mp||0,win:+row.win||0,pp:+row.pp||0,kp:+row.kp||0,tp:(row.tp!=null?+row.tp:(+row.pp||0)+(+row.kp||0))}})}
+async function uploadDesignBackground(file){if(!file)return null;const ext=(file.name.split('.').pop()||'png').toLowerCase(),p='templates/'+crypto.randomUUID()+'.'+ext,u=await supabaseClient.storage.from('heo-design-assets').upload(p,file,{upsert:false,contentType:file.type});if(u.error)throw new Error(u.error.message);return p}function designPublicUrl(p){return p?supabaseClient.storage.from('heo-design-assets').getPublicUrl(p).data.publicUrl:null}
+function templateCfg(){return{...cfg(),table:designState.table,extras:designState.extras.map(o=>({id:o.id,type:o.type,text:o.text,srcPath:o.srcPath||null,x:o.x,y:o.y,w:o.w,h:o.h,baseH:o.baseH||o.h,size:o.size,color:o.color,rot:o.rot||0})),tableBgPath:designState.tableBgPath}}
+async function applyTemplateConfig(c){if(!c)return;const map={bannerSize:'size',bannerOrgName:'orgName',bannerOrgColor:'orgColor',bannerOrgSize:'orgSize',bannerLogoSize:'logoSize',bannerBgOpacity:'bgOpacity',bannerOverlay:'overlay',cellRadius:'cellRadius',cellShadow:'cellShadow',tableGap:'tableGap',teamTextSize:'teamTextSize',numberTextSize:'numberTextSize',showOrgName:'showOrgName',showHeoLogo:'showHeoLogo',tableBaseWidth:'tableBaseWidth'};Object.entries(map).forEach(([id,k])=>{const el=$('#'+id);if(el&&c[k]!==undefined)(el.type==='checkbox'?el.checked=!!c[k]:el.value=c[k])});if(c.table)Object.assign(designState.table,c.table);designState.tableBgPath=c.tableBgPath||null;
+if(!designState.table||typeof designState.table!=='object')designState.table={x:0,y:0,w:0,h:0};
+designState.table.x=Number.isFinite(+designState.table.x)?+designState.table.x:0;
+designState.table.y=Number.isFinite(+designState.table.y)?+designState.table.y:0;
+designState.table.w=Number.isFinite(+designState.table.w)?Math.max(520,+designState.table.w):0;
+designState.table.h=Number.isFinite(+designState.table.h)?Math.max(1,+designState.table.h):0;
+designState.extras=(c.extras||[]).filter(o=>o&&o.id).map(o=>({...o,baseH:o.baseH||o.h,image:null,src:o.srcPath?designPublicUrl(o.srcPath):(o.src||null),w:Math.max(20,+o.w||40),h:Math.max(20,+o.h||40),x:+o.x||0,y:+o.y||0}));
+}
+async function loadSavedTemplates(){if(!admin()||!supabaseClient)return;const {data,error}=await supabaseClient.from('design_templates').select('*').order('created_at',{ascending:false});if(error){$('#bannerBgStatus').textContent=error.message;return}templateCache=data||[];const s=$('#savedTemplate');if(s)s.innerHTML='<option value="">Saved templates</option>'+templateCache.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('')}
+$('#designMoreBtn')?.addEventListener('click',e=>{e.stopPropagation();$('#designMoreMenu').classList.toggle('open')});document.addEventListener('click',e=>{if(!e.target.closest('.designMore'))$('#designMoreMenu')?.classList.remove('open')});$('#designSettingsBtn')?.addEventListener('click',()=>$('#designSettings').style.display=$('#designSettings').style.display==='none'?'block':'none');
+$('#bannerTournament')?.addEventListener('change',async()=>{designState.table.w=0;designState.table.h=0;designState.extras=[];await loadPointTableForDesign($('#bannerTournament').value);await renderBanner()});$('#bannerSize')?.addEventListener('change',renderBanner);['bannerOrgName','bannerOrgColor','bannerOrgSize','bannerLogoSize','bannerBgOpacity','bannerOverlay','cellRadius','cellShadow','tableGap','teamTextSize','numberTextSize','showOrgName','showHeoLogo','tableBaseWidth'].forEach(id=>$('#'+id)?.addEventListener('input',renderBanner));
+$('#bannerBg')?.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;bgImg=new Image();bgImg.onload=renderBanner;bgImg.src=URL.createObjectURL(f);$('#bannerBgStatus').textContent='Banner background loaded.'});$('#tableBg')?.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;tableBgImg=new Image();tableBgImg.onload=renderBanner;tableBgImg.src=URL.createObjectURL(f);$('#bannerBgStatus').textContent='Table background loaded.'});
+$('#addLogo')?.addEventListener('click',()=>$('#brandingLogoFile')?.click());$('#brandingLogoFile')?.addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const path=await uploadDesignBackground(f),src=designPublicUrl(path),id='logo_'+crypto.randomUUID();designState.extras.push({id,type:'image',srcPath:path,src,x:120,y:120,w:180,h:180,baseH:180,size:0,color:'#fff',rot:0});designState.selected=id;$('#bannerBgStatus').textContent='Branding logo added. Click and drag it like an object.';e.target.value='';await renderBanner()}catch(err){$('#bannerBgStatus').textContent='Logo add failed: '+err.message}});
+$('#addText')?.addEventListener('click',()=>{const text=prompt('Enter branding text:','HEO');if(!text)return;const id='text_'+crypto.randomUUID();designState.extras.push({id,type:'text',text,x:160,y:160,w:320,h:70,baseH:70,size:48,color:'#ffffff',rot:0});designState.selected=id;renderBanner()});
+function beginObjectDrag(obj,startX,startY,sx){const ox=startX-obj.x,oy=startY-obj.y;const mv=ev=>{const r=$('#bannerCanvas').getBoundingClientRect(),x=(ev.clientX-r.left)/sx,y=(ev.clientY-r.top)/sx;obj.x=Math.max(0,Math.min($('#bannerCanvas').width-obj.w,x-ox));obj.y=Math.max(0,Math.min($('#bannerCanvas').height-obj.h,y-oy));renderBanner()};const up=()=>{document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up)};document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up)}
+$('#designTableSelection')?.addEventListener('pointerdown',e=>{if(!e.target.closest('.br'))return;const r=$('#bannerCanvas').getBoundingClientRect(),sx=r.width/$('#bannerCanvas').width,sel=designState.selected,obj=sel==='table'?designState.table:designState.extras.find(o=>o.id===sel);if(!obj)return;const startX=e.clientX,startW=obj.w,ratio=obj.h/Math.max(1,obj.w);const mv=ev=>{obj.w=Math.max(sel==='table'?520:40,startW+(ev.clientX-startX)/sx);obj.h=obj.w*ratio;renderBanner()};const up=()=>{document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up)};document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);e.preventDefault();e.stopPropagation()});
+$('#designCanvasStage')?.addEventListener('dblclick',e=>{const r=$('#bannerCanvas').getBoundingClientRect(),sx=r.width/$('#bannerCanvas').width,px=(e.clientX-r.left)/sx,py=(e.clientY-r.top)/sx,o=extraAt(px,py);if(o?.type==='text'){const v=prompt('Edit text:',o.text||'');if(v!==null){o.text=v;renderBanner()}}});
+$('#designCanvasStage')?.addEventListener('pointerdown',e=>{if(e.target.closest('#designTableSelection'))return;const r=$('#bannerCanvas').getBoundingClientRect(),sx=r.width/$('#bannerCanvas').width,px=(e.clientX-r.left)/sx,py=(e.clientY-r.top)/sx,o=extraAt(px,py),t=designState.table;if(o){designState.selected=o.id;updateSelection();beginObjectDrag(o,px,py,sx);e.preventDefault();return}if(px>=t.x&&px<=t.x+t.w&&py>=t.y&&py<=t.y+t.h){designState.selected='table';updateSelection();const ox=px-t.x,oy=py-t.y;const mv=ev=>{const rr=$('#bannerCanvas').getBoundingClientRect(),x=(ev.clientX-rr.left)/sx,y=(ev.clientY-rr.top)/sx;designState.table.x=Math.max(0,Math.min($('#bannerCanvas').width-t.w,x-ox));designState.table.y=Math.max(0,Math.min($('#bannerCanvas').height-t.h,y-oy));renderBanner()};const up=()=>{document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up)};document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);e.preventDefault()}else{designState.selected=null;updateSelection()}});
+document.addEventListener('keydown',e=>{if(e.key==='Delete'&&designState.selected&&designState.selected!=='table'&&!e.target.matches('input,textarea,select')){designState.extras=designState.extras.filter(o=>o.id!==designState.selected);designState.selected='table';renderBanner()}});
+$('#newTemplate')?.addEventListener('click',()=>{designState.table={x:0,y:0,w:0,h:0};designState.tableBgPath=null;designState.extras=[];designState.selected=null;tableBgImg=null;bgImg=null;$('#bannerBg').value='';$('#tableBg').value='';$('#brandingLogoFile').value='';$('#templateName').value='';$('#savedTemplate').value='';renderBanner()});$('#savedTemplate')?.addEventListener('change',async()=>{const t=templateCache.find(x=>x.id===$('#savedTemplate').value);if(!t)return;$('#templateName').value=t.name||'';bgImg=null;tableBgImg=null;await applyTemplateConfig(t.config||{});if(t.background_path)bgImg=await loadImage(designPublicUrl(t.background_path));if(t.config?.tableBgPath)tableBgImg=await loadImage(designPublicUrl(t.config.tableBgPath));designState.selected='table';renderBanner()});
+$('#saveTemplate')?.addEventListener('click',async()=>{if(!admin())return;try{const name=$('#templateName').value.trim();if(!name)throw Error('Enter a design name.');let bp=null,tp=designState.tableBgPath,bf=$('#bannerBg').files[0],tf=$('#tableBg').files[0];if(bf){bp=await uploadDesignBackground(bf);bgImg=await loadImage(designPublicUrl(bp))}if(tf){tp=await uploadDesignBackground(tf);tableBgImg=await loadImage(designPublicUrl(tp));designState.tableBgPath=tp}const selected=templateCache.find(x=>x.id===$('#savedTemplate').value),payload={name,background_path:bp||selected?.background_path||null,config:{...templateCfg(),tableBgPath:tp}};const q=selected?await supabaseClient.from('design_templates').update(payload).eq('id',selected.id).select().single():await supabaseClient.from('design_templates').insert({...payload,created_by:currentUser.id}).select().single();if(q.error)throw Error(q.error.message);await loadSavedTemplates();if(q.data)$('#savedTemplate').value=q.data.id;$('#bannerBgStatus').textContent='Design saved.'}catch(e){$('#bannerBgStatus').textContent='Save failed: '+e.message}});$('#renameTemplate')?.addEventListener('click',async()=>{if(!admin())return;const id=$('#savedTemplate').value,n=$('#templateName').value.trim();if(!id||!n)return;const q=await supabaseClient.from('design_templates').update({name:n}).eq('id',id);$('#bannerBgStatus').textContent=q.error?q.error.message:'Design renamed.';await loadSavedTemplates()});$('#deleteTemplate')?.addEventListener('click',async()=>{if(!admin())return;const id=$('#savedTemplate').value;if(!id)return;const q=await supabaseClient.from('design_templates').delete().eq('id',id);if(q.error){$('#bannerBgStatus').textContent=q.error.message;return}await loadSavedTemplates();$('#bannerBgStatus').textContent='Design deleted.'});
+$('#renderBanner')?.addEventListener('click',renderBanner);async function canvasBlob(type,q){return new Promise((res,rej)=>$('#bannerCanvas').toBlob(b=>b?res(b):rej(Error('Could not create image.')),type,q))}$('#downloadBannerPng')?.addEventListener('click',async()=>{if(!admin())return;await renderBanner();const a=document.createElement('a');a.download='HEO-Point-Table.png';a.href=$('#bannerCanvas').toDataURL('image/png');a.click()});$('#downloadBannerJpg')?.addEventListener('click',async()=>{if(!admin())return;await renderBanner();const a=document.createElement('a');a.download='HEO-Point-Table.jpg';a.href=$('#bannerCanvas').toDataURL('image/jpeg',.95);a.click()});$('#publishBanner')?.addEventListener('click',async()=>{if(!admin())return;const tid=$('#bannerTournament').value;if(!tid)return;const b=$('#publishBanner');b.disabled=true;try{await renderBanner();const p=await canvasBlob('image/png'),j=await canvasBlob('image/jpeg',.95),base='published/'+tid;let q=await supabaseClient.storage.from('heo-media').upload(base+'.png',p,{upsert:true,contentType:'image/png'});if(q.error)throw Error(q.error.message);q=await supabaseClient.storage.from('heo-media').upload(base+'.jpg',j,{upsert:true,contentType:'image/jpeg'});if(q.error)throw Error(q.error.message);const pu=supabaseClient.storage.from('heo-media').getPublicUrl(base+'.png').data.publicUrl+'?v='+Date.now(),ju=supabaseClient.storage.from('heo-media').getPublicUrl(base+'.jpg').data.publicUrl+'?v='+Date.now();q=await supabaseClient.from('heo_tournaments').update({published:true,published_image_path:base+'.png',published_image_url:pu,published_jpg_path:base+'.jpg',published_jpg_url:ju,published_at:new Date().toISOString()}).eq('id',tid);if(q.error)throw Error(q.error.message);$('#bannerBgStatus').textContent='Published successfully.'}catch(e){$('#bannerBgStatus').textContent='Publish failed: '+e.message}finally{b.disabled=false}});
 
-let templateCache=[];
-async function loadSavedTemplates(){
-  if(!admin()||!supabaseClient)return;
-  const {data,error}=await supabaseClient.from('design_templates').select('*').order('created_at',{ascending:false});
-  if(error){$('#bannerBgStatus').textContent='Template load error: '+error.message;return}
-  templateCache=data||[];
-  const sel=$('#savedTemplate');if(!sel)return;
-  const old=sel.value;sel.innerHTML='<option value="">Saved templates</option>'+templateCache.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
-  if(templateCache.some(t=>t.id===old))sel.value=old;
-}
-function applyTemplateConfig(c){
-  if(!c)return;
-  const map={bannerSize:'size',bannerTemplate:'template',bannerOrgName:'orgName',showOrgName:'showOrgName',bannerOrgColor:'orgColor',bannerOrgSize:'orgSize',bannerLogoSize:'logoSize',bannerLogoX:'logoX',bannerLogoY:'logoY',showHeoLogo:'showHeoLogo',tableX:'tableX',tableY:'tableY',tableScale:'tableScale',headerSize:'headerSize',rankSize:'rankSize',teamSize:'teamSize',pointsSize:'pointsSize',tableBgOpacity:'tableBgOpacity',cellText:'cellText',cellGap:'cellGap',cellRadius:'cellRadius',bannerBgOpacity:'bgOpacity',bannerOverlay:'overlay'};
-  Object.entries(map).forEach(([id,k])=>{const el=$('#'+id);if(c[k]===undefined||!el)return;if(el.type==='checkbox')el.checked=!!c[k];else el.value=c[k]});
-}
-async function uploadDesignBackground(file){
-  if(!file)return null;
-  const ext=(file.name.split('.').pop()||'png').toLowerCase(),path='templates/'+crypto.randomUUID()+'.'+ext;
-  const up=await supabaseClient.storage.from('heo-design-assets').upload(path,file,{upsert:false,contentType:file.type});
-  if(up.error)throw new Error(up.error.message);
-  return path;
-}
-function designPublicUrl(path){return path?supabaseClient.storage.from('heo-design-assets').getPublicUrl(path).data.publicUrl:null}
-$('#newTemplate')?.addEventListener('click',()=>{$('#templateName').value='';$('#savedTemplate').value='';$('#bannerBg').value='';bgImg=null;$('#bannerBgStatus').textContent='New template. Save to store its background.';renderBanner()});
-$('#savedTemplate')?.addEventListener('change',async()=>{
-  const t=templateCache.find(x=>x.id===$('#savedTemplate').value);if(!t)return;
-  $('#templateName').value=t.name||'';applyTemplateConfig(t.config||{});
-  if(t.background_path){bgImg=await loadImage(designPublicUrl(t.background_path));$('#bannerBgStatus').textContent=bgImg?'Saved background loaded.':'Saved background could not be loaded.'}
-  else{bgImg=null;$('#bannerBgStatus').textContent='Template has no saved background.'}
-  renderBanner();
-});
-$('#saveTemplate')?.addEventListener('click',async()=>{
-  if(!admin())return;
-  try{
-    const name=$('#templateName').value.trim();if(!name)throw new Error('Enter a template name.');
-    const selected=templateCache.find(x=>x.id===$('#savedTemplate').value);
-    let path=selected?.background_path||null;
-    const f=$('#bannerBg').files[0];
-    if(f){path=await uploadDesignBackground(f);bgImg=await loadImage(designPublicUrl(path))}
-    const payload={name,background_path:path,config:cfg()};
-    const result=selected
-      ? await supabaseClient.from('design_templates').update(payload).eq('id',selected.id).select().single()
-      : await supabaseClient.from('design_templates').insert({...payload,created_by:currentUser.id}).select().single();
-    if(result.error)throw new Error(result.error.message);
-    $('#bannerBg').value='';$('#bannerBgStatus').textContent='Template saved.';await loadSavedTemplates();if(result.data)$('#savedTemplate').value=result.data.id;
-  }catch(err){$('#bannerBgStatus').textContent='Save failed: '+err.message}
-});
-$('#renameTemplate')?.addEventListener('click',async()=>{
-  if(!admin())return;const id=$('#savedTemplate').value,name=$('#templateName').value.trim();
-  if(!id||!name){$('#bannerBgStatus').textContent='Select a saved template and enter a name.';return}
-  const {error}=await supabaseClient.from('design_templates').update({name}).eq('id',id);
-  $('#bannerBgStatus').textContent=error?error.message:'Template renamed.';await loadSavedTemplates();$('#savedTemplate').value=id;
-});
-$('#deleteTemplate')?.addEventListener('click',async()=>{
-  if(!admin())return;const id=$('#savedTemplate').value;if(!id){$('#bannerBgStatus').textContent='Select a template first.';return}
-  const t=templateCache.find(x=>x.id===id);if(!confirm('Delete this template?'))return;
-  const {error}=await supabaseClient.from('design_templates').delete().eq('id',id);if(error){$('#bannerBgStatus').textContent=error.message;return}
-  if(t?.background_path)await supabaseClient.storage.from('heo-design-assets').remove([t.background_path]);
-  $('#savedTemplate').value='';$('#templateName').value='';$('#bannerBgStatus').textContent='Template deleted.';await loadSavedTemplates();
-});
-let designDrag={active:false,startX:0,startY:0,origX:50,origY:55};
-let tableBgImg=null;
-let designLoadedTournamentId=null;
-function roundRect(ctx,x,y,w,h,r){const rr=Math.max(0,Math.min(r,Math.min(w,h)/2));ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath()}
-function bannerPointerPos(e){const c=$('#bannerCanvas'),r=c.getBoundingClientRect();return {x:(e.clientX-r.left)*(c.width/r.width),y:(e.clientY-r.top)*(c.height/r.height)}}
-async function loadPointTableForDesign(tid){
-  ptCache=[];
-  designLoadedTournamentId=tid||null;
-  if(!tid||!supabaseClient)return [];
-  $('#publishStatus').textContent='Loading tournament data...';
-  const rel=await supabaseClient.from('heo_tournament_teams').select('team_id').eq('tournament_id',tid).order('created_at',{ascending:true});
-  if(rel.error){$('#publishStatus').textContent='Team load error: '+rel.error.message;return []}
-  const teamIds=[...new Set((rel.data||[]).map(x=>x.team_id).filter(Boolean))];
-  if(!teamIds.length){$('#publishStatus').textContent='No teams have been added to this tournament yet.';return []}
-  const tq=await supabaseClient.from('heo_teams').select('id,team_name,logo_url').in('id',teamIds);
-  if(tq.error){$('#publishStatus').textContent='Team data error: '+tq.error.message;return []}
-  const teamMap=new Map((tq.data||[]).map(x=>[x.id,x]));
-  const q=await supabaseClient.from('pt_entries').select('*').eq('tournament_id',tid);
-  if(q.error){$('#publishStatus').textContent='Point data error: '+q.error.message;return []}
-  const entries=q.data||[];
-  for(const teamId of teamIds){
-    const team=teamMap.get(teamId); if(!team)continue;
-    let row=entries.find(x=>String(x.team_id||'')===String(teamId));
-    if(!row)row=entries.find(x=>!x.team_id&&String(x.team_name||'').trim().toLowerCase()===String(team.team_name||'').trim().toLowerCase());
-    if(!row)continue;
-    ptCache.push({...row,team_id:teamId,team_name:team.team_name,logo_url:team.logo_url||row.logo_url||null,tournament_id:tid,mp:Number(row.mp)||0,win:Number(row.win)||0,pp:Number(row.pp)||0,kp:Number(row.kp)||0,tp:Number(row.tp ?? ((Number(row.pp)||0)+(Number(row.kp)||0)))||0});
-  }
-  $('#publishStatus').textContent=ptCache.length?`${ptCache.length} team(s) loaded.`:'Teams loaded, but no saved point entries were found for this tournament.';
-  return ptCache;
-}
-function tableBounds(W,H,C){
-  const scale=Math.max(.55,Math.min(1.4,Number(C.tableScale||100)/100));
-  const tableW=W*.91*scale;
-  const rowH=Math.max(38,H*.048)*scale;
-  const headerH=Math.max(34,H*.044)*scale;
-  const rows=Math.min(14,sortRows(ptCache.filter(x=>String(x.tournament_id)===String($('#bannerTournament')?.value))).length);
-  const tableH=headerH+(rows*rowH)+(Math.max(0,rows)*Number(C.cellGap||0)*scale);
-  const cx=W*(Number(C.tableX||50)/100),cy=H*(Number(C.tableY||55)/100);
-  return {x:cx-tableW/2,y:cy-tableH/2,w:tableW,h:tableH,scale,headerH,rowH,rows};
-}
-function drawTableBackground(ctx,B,C,r){
-  if(!tableBgImg||!tableBgImg.complete||!tableBgImg.naturalWidth)return;
-  ctx.save();
-  if(r){roundRect(ctx,B.x,B.y,B.w,B.h,r);ctx.clip()}
-  else ctx.rect(B.x,B.y,B.w,B.h),ctx.clip();
-  ctx.globalAlpha=Math.max(0,Math.min(100,Number(C.tableBgOpacity||100)))/100;
-  ctx.drawImage(tableBgImg,B.x,B.y,B.w,B.h);
-  ctx.restore();
-}
-async function renderBanner(){
-  const c=$('#bannerCanvas');if(!c)return;
-  const size=$('#bannerSize').value||'1080x1080';const [W,H]=size.split('x').map(Number);
-  c.width=W;c.height=H;
-  const ctx=c.getContext('2d');const C=cfg();
-  fitBg(ctx,W,H);
-  ctx.fillStyle=`rgba(0,5,12,${Math.max(0,Math.min(100,C.overlay))/100})`;ctx.fillRect(0,0,W,H);
-  const tid=$('#bannerTournament').value;const t=tournamentById(tid);
-  if(tid && designLoadedTournamentId!==tid)await loadPointTableForDesign(tid);
-  const rows=sortRows(ptCache.filter(x=>String(x.tournament_id)===String(tid))).slice(0,14);
-  const logo=await loadImage('assets/heo-logo.jpg');
-  const logoSize=Math.min(C.logoSize,W*.16);
-  const lx=W*(C.logoX/100)-logoSize/2,ly=H*(C.logoY/100);
-  if(C.showHeoLogo&&logo)ctx.drawImage(logo,lx,ly,logoSize,logoSize);
-  ctx.textAlign='center';ctx.fillStyle=C.orgColor;ctx.font=`900 ${C.orgSize}px Arial`;
-  const orgY=ly+(C.showHeoLogo?logoSize:0)+Math.max(16,H*.018);
-  if(C.showOrgName)ctx.fillText(C.orgName,W/2,orgY);
-  const metaY=(C.showOrgName?orgY:ly+(C.showHeoLogo?logoSize:0))+Math.max(22,H*.04);
-  ctx.fillStyle=C.cellText;ctx.font=`900 ${Math.max(12,C.headerSize*.75)}px Arial`;
-  ctx.fillText(`TOURNAMENT  ${t?.name||'—'}   |   ROUND  ${t?.round||'—'}   |   DAY  ${t?.day||'—'}   |   WEEK  ${t?.week||'—'}`,W/2,metaY);
-  const B=tableBounds(W,H,C),g=Math.max(0,C.cellGap*B.scale),r=Math.max(0,C.cellRadius*B.scale),tableW=B.w;
-  drawTableBackground(ctx,B,C,r);
-  const cols=[.08,.09,.25,.10,.10,.10,.09,.09],widths=cols.map(v=>tableW*v),headers=['RANK','LOGO','TEAM','MP','WIN','PP','KP','TP'];
-  let x=B.x;ctx.textAlign='center';
-  headers.forEach((h,i)=>{const cw=Math.max(1,widths[i]-g);ctx.fillStyle=C.cellText;ctx.font=`900 ${Math.max(10,C.headerSize*B.scale)}px Arial`;ctx.fillText(h,x+cw/2,B.y+B.headerH*.66);x+=widths[i]});
-  const imgs=await Promise.all(rows.map(r=>loadImage(r.logo_url)));
-  rows.forEach((row,i)=>{
-    const y=B.y+B.headerH+(i*B.rowH);
-    ctx.fillStyle=C.cellText;ctx.font=`900 ${Math.max(10,C.rankSize*B.scale)}px Arial`;ctx.fillText(String(i+1).padStart(2,'0'),B.x+widths[0]/2,y+B.rowH*.63);
-    if(imgs[i]){const ss=Math.min(B.rowH-g-8,widths[1]-g-8);if(ss>0)ctx.drawImage(imgs[i],B.x+widths[0]+(widths[1]-g-ss)/2,y+(B.rowH-ss)/2,ss,ss)}
-    const vals=[row.team_name,row.mp||0,row.win||0,row.pp||0,row.kp||0,row.tp||0];let xx=B.x+widths[0]+widths[1];
-    vals.forEach((v,j)=>{ctx.fillStyle=j===5?'#ffd21a':C.cellText;ctx.font=`${j===0?'900':'800'} ${Math.max(10,(j===0?C.teamSize:C.pointsSize)*B.scale)}px Arial`;const maxChars=j===0?18:8;ctx.fillText(String(v).slice(0,maxChars),xx+(widths[j+2]-g)/2,y+B.rowH*.63);xx+=widths[j+2]});
-  });
-  if(C.template==='classic'){ctx.strokeStyle=C.cellText;ctx.globalAlpha=.18;ctx.lineWidth=Math.max(2,W*.003);ctx.strokeRect(W*.025,H*.02,W*.95,H*.955);ctx.globalAlpha=1}
-  else if(C.template==='sharp'){ctx.strokeStyle=C.cellText;ctx.globalAlpha=.22;ctx.lineWidth=Math.max(3,W*.004);ctx.beginPath();ctx.moveTo(W*.025,H*.025);ctx.lineTo(W*.18,H*.025);ctx.lineTo(W*.12,H*.075);ctx.moveTo(W*.975,H*.025);ctx.lineTo(W*.82,H*.025);ctx.lineTo(W*.88,H*.075);ctx.stroke();ctx.globalAlpha=1}
-  ctx.textAlign='left';
-  if(!tid)$('#publishStatus').textContent='Select a tournament to load its data.';
-  else if(!rows.length && ptCache.length)$('#publishStatus').textContent='Teams loaded, but no point rows are available.';
-}
-async function exportBanner(mime,name){
-  try{await renderBanner();const c=$('#bannerCanvas');const data=c.toDataURL(mime,0.95);const a=document.createElement('a');a.href=data;a.download=name;a.click();$('#publishStatus').textContent='Banner exported successfully.'}
-  catch(err){$('#publishStatus').textContent='Export failed: '+err.message}
-}
-async function publishBanner(){
-  if(!admin()||!supabaseClient){$('#publishStatus').textContent='Admin access is required.';return}
-  const tid=$('#bannerTournament').value;if(!tid){$('#publishStatus').textContent='Select a tournament first.';return}
-  try{
-    await renderBanner();
-    const c=$('#bannerCanvas');
-    const pngBlob=await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('PNG creation failed')),'image/png'));
-    const jpgBlob=await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('JPG creation failed')),'image/jpeg',0.95));
-    const base='published/'+tid+'/'+Date.now();
-    const pu=await supabaseClient.storage.from('heo-design-assets').upload(base+'.png',pngBlob,{upsert:true,contentType:'image/png'});if(pu.error)throw new Error(pu.error.message);
-    const ju=await supabaseClient.storage.from('heo-design-assets').upload(base+'.jpg',jpgBlob,{upsert:true,contentType:'image/jpeg'});if(ju.error)throw new Error(ju.error.message);
-    const pngUrl=supabaseClient.storage.from('heo-design-assets').getPublicUrl(base+'.png').data.publicUrl;
-    const jpgUrl=supabaseClient.storage.from('heo-design-assets').getPublicUrl(base+'.jpg').data.publicUrl;
-    const {error}=await supabaseClient.from('pt_tournaments').update({published:true,published_image_path:base+'.png',published_image_url:pngUrl,published_jpg_path:base+'.jpg',published_jpg_url:jpgUrl,published_at:new Date().toISOString()}).eq('id',tid);
-    if(error)throw new Error(error.message);
-    $('#publishStatus').textContent='Published successfully. Public users can now view and download this banner.';
-  }catch(err){$('#publishStatus').textContent='Publish failed: '+err.message}
-}
-$('#tableBg')?.addEventListener('change',async()=>{const f=$('#tableBg').files[0];if(!f){tableBgImg=null;return}tableBgImg=await loadImage(URL.createObjectURL(f));$('#bannerBgStatus').textContent=tableBgImg?'Table background loaded.':'Table background could not be loaded.';renderBanner()});
-$('#bannerBg')?.addEventListener('change',async()=>{const f=$('#bannerBg').files[0];if(!f){bgImg=null;return}bgImg=await loadImage(URL.createObjectURL(f));$('#bannerBgStatus').textContent=bgImg?'Banner background loaded.':'Banner background could not be loaded.';renderBanner()});
-$('#bannerTournament')?.addEventListener('change',async()=>{ptCache=[];designLoadedTournamentId=null;$('#publishStatus').textContent='Loading tournament data...';await loadPointTableForDesign($('#bannerTournament').value);await renderBanner()});
-$('#renderBanner')?.addEventListener('click',renderBanner);
-$('#downloadBannerPng')?.addEventListener('click',()=>exportBanner('image/png','HEO-Point-Table.png'));
-$('#downloadBannerJpg')?.addEventListener('click',()=>exportBanner('image/jpeg','HEO-Point-Table.jpg'));
-$('#publishBanner')?.addEventListener('click',publishBanner);
-const designCanvas=$('#bannerCanvas');
-designCanvas?.addEventListener('pointerdown',e=>{const tid=$('#bannerTournament').value;if(!tid)return;const p=bannerPointerPos(e);const [W,H]=[$('#bannerCanvas').width,$('#bannerCanvas').height];const B=tableBounds(W,H,cfg());if(p.x>=B.x&&p.x<=B.x+B.w&&p.y>=B.y&&p.y<=B.y+B.h){designDrag={active:true,startX:p.x,startY:p.y,origX:+$('#tableX').value||50,origY:+$('#tableY').value||55};designCanvas.setPointerCapture?.(e.pointerId);e.preventDefault()}});
-designCanvas?.addEventListener('pointermove',e=>{if(!designDrag.active)return;const p=bannerPointerPos(e),W=designCanvas.width,H=designCanvas.height;const nx=designDrag.origX+(p.x-designDrag.startX)/W*100,ny=designDrag.origY+(p.y-designDrag.startY)/H*100;$('#tableX').value=Math.max(5,Math.min(95,nx));$('#tableY').value=Math.max(5,Math.min(95,ny));renderBanner()});
-designCanvas?.addEventListener('pointerup',()=>{designDrag.active=false});designCanvas?.addEventListener('pointercancel',()=>{designDrag.active=false});
-$$('[data-admin-tab]').forEach(b=>b.onclick=async()=>{$$('.adminPanel').forEach(x=>x.style.display='none');const panel=$('#admin'+b.dataset.adminTab.charAt(0).toUpperCase()+b.dataset.adminTab.slice(1));if(panel)panel.style.display='block';if(b.dataset.adminTab==='users')await loadUsers();if(b.dataset.adminTab==='tournaments')await loadTournaments();if(b.dataset.adminTab==='points'){await loadTournaments();await loadAllTeams();await loadPointTable()}if(b.dataset.adminTab==='design'){await populateBannerTournaments();await loadSavedTemplates();if($('#bannerTournament').value)await loadPointTableForDesign($('#bannerTournament').value);await renderBanner()}if(b.dataset.adminTab==='reports')loadReports()});
+$$('[data-admin-tab]').forEach(b=>b.onclick=async()=>{$$('.adminPanel').forEach(x=>x.style.display='none');const panel=$('#admin'+b.dataset.adminTab.charAt(0).toUpperCase()+b.dataset.adminTab.slice(1));if(panel)panel.style.display='block';if(b.dataset.adminTab==='users')await loadUsers();if(b.dataset.adminTab==='tournaments')await loadTournaments();if(b.dataset.adminTab==='points'){await loadTournaments();await loadAllTeams();await loadPointTable()}if(b.dataset.adminTab==='design'){await populateBannerTournaments();await loadSavedTemplates();if(!ptCache.length&&$('#bannerTournament').value)await loadPointTable();renderBanner()}if(b.dataset.adminTab==='reports')loadReports()});
 
-async function loadHighlight(){if(!supabaseClient)return;const {data,error}=await supabaseClient.from('home_highlights').select('*').eq('active',true).order('created_at',{ascending:false}).limit(1).maybeSingle();const box=$('#highlightContent');if(error||!data){box.innerHTML='<div class="emptyMedia">No highlight uploaded yet.</div>';return}const url=data.public_url;box.innerHTML=data.media_type==='video'?`<video class="highlightMedia" controls playsinline src="${escapeAttr(url)}"></video>`:`<img class="highlightMedia" src="${escapeAttr(url)}" alt="HEO Highlight">`;if(admin())$('#highlightAdminHint').textContent='Admin can replace this from Admin Panel.'}
+async function loadHighlight(){if(!supabaseClient)return;const {data,error}=await supabaseClient.from('home_highlights').select('*').eq('active',true).order('created_at',{ascending:false}).limit(1).maybeSingle();const box=$('#highlightContent');if(error||!data){box.innerHTML='<div class="emptyMedia">No highlight uploaded yet.</div>';return}const url=data.public_url;box.innerHTML=data.media_type==='video'?`<video class="highlightMedia" controls playsinline src="${escAttr(url)}"></video>`:`<img class="highlightMedia" src="${escAttr(url)}" alt="HEO Highlight">`;if(admin())$('#highlightAdminHint').textContent='Admin can replace this from Admin Panel.'}
 $('#uploadHighlight')?.addEventListener('click',async()=>{
   const f=$('#highlightFile').files[0];
   if(!f||!admin()){$('#highlightMsg').textContent='Select a media file and make sure you are an approved admin.';return}
